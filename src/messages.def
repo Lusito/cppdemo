@@ -1,0 +1,20 @@
+include adapters "../src/CustomAdapters.hpp"
+include messages "../src/CustomMessages.hpp"
+
+struct PlayerListEntry
+    field playerIndex uint8_t
+    field name std::string
+
+message HandshakeServer !reliable
+    field PlayerIndex uint8_t
+    field[] playerList PlayerListEntry
+
+message HandshakeClient !reliable
+    field name std::string
+
+message Chat !reliable
+    field command std::string
+
+message MyCustom !reliable
+    field text std::string
+    field data MyCustomStruct

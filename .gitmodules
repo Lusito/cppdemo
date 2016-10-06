@@ -1,0 +1,5 @@
+[submodule "lib/eznet"]
+	path = lib/eznet
+	url = https://github.com/Lusito/eznet.git
+	branch = develop
+	ignore = untracked
