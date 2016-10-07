@@ -76,3 +76,7 @@ compile_commands.json
 #generated files
 generated/*.cpp
 generated/*.hpp
+
+#binaries
+server
+client

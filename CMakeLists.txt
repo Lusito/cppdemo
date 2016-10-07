@@ -40,6 +40,9 @@ target_link_libraries(server ${LINKED_LIBRARIES})
 add_executable(client ${SHARED_SOURCE_FILES} ${CMAKE_CURRENT_SOURCE_DIR}/src/Client.cpp)
 target_link_libraries(client ${LINKED_LIBRARIES})
 
+set_property(TARGET client server PROPERTY CXX_STANDARD 14)
+set_property(TARGET client server PROPERTY CXX_STANDARD_REQUIRED ON)
+
 set_source_files_properties(${GENERATED_SOURCE_FILES} PROPERTIES GENERATED TRUE)
 
 #generate files
