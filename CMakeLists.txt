@@ -7,8 +7,27 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/lib/eznet)
 include_directories(SYSTEM ${CMAKE_CURRENT_SOURCE_DIR}/lib/eznet/include)
 include_directories(SYSTEM ${CMAKE_CURRENT_SOURCE_DIR}/lib/eznet/lib/enet/include)
 
+find_package(glfw3 3.2 QUIET)
+
+if(glfw3_FOUND)
+    message(STATUS "Found GLFW, using it")
+else()
+    message(STATUS "Did not find good GLFW version, adding internal one.")
+    set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
+    set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+    set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+    add_subdirectory(lib/glfw)
+endif()
+
+#opengl
+find_package(OpenGL REQUIRED)
+include_directories(SYSTEM ${OPENGL_INCLUDE_DIR})
+
+#gl3w
+include_directories(SYSTEM ${CMAKE_CURRENT_SOURCE_DIR}/lib/gl3w/include)
+
 #libraries to link
-set(LINKED_LIBRARIES eznet enet )
+set(LINKED_LIBRARIES eznet enet glfw ${OPENGL_gl_LIBRARY})
 if(WIN32)
     set( LINKED_LIBRARIES
         ${LINKED_LIBRARIES}
@@ -29,6 +48,8 @@ set(GENERATED_SOURCE_FILES
 #shared files
 set(SHARED_SOURCE_FILES
     ${GENERATED_SOURCE_FILES}
+    ${CMAKE_CURRENT_SOURCE_DIR}/lib/gl3w/src/gl3w.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/AbstractDemo.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/CustomAdapters.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/CustomAdapters.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/CustomMessages.hpp

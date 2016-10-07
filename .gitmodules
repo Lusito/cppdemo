@@ -3,3 +3,7 @@
 	url = https://github.com/Lusito/eznet.git
 	branch = develop
 	ignore = untracked
+[submodule "lib/glfw"]
+	path = lib/glfw
+	url = https://github.com/glfw/glfw.git
+	ignore = untracked
