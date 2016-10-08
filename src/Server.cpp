@@ -14,8 +14,8 @@ public:
 			x -= 1;
 		if(moveRight)
 			x += 1;
-		vertices[2].x += x * deltaTime * PLAYER_SPEED;
-		vertices[2].y += y * deltaTime * PLAYER_SPEED;
+//		vertices[2].x += x * deltaTime * PLAYER_SPEED;
+//		vertices[2].y += y * deltaTime * PLAYER_SPEED;
 	}
 };
 

@@ -1,45 +1,25 @@
 #include "AbstractDemo.hpp"
-#include "../lib/glfw/deps/linmath.h"
-#include <GL/gl3w.h>
+#include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <stdlib.h>
 #include <stdio.h>
 
-static const char* vertex_shader_text =
-"uniform mat4 MVP;\n"
-"attribute vec3 vCol;\n"
-"attribute vec2 vPos;\n"
-"varying vec3 color;\n"
-"void main()\n"
-"{\n"
-"    gl_PointSize = 10.0;\n"
-"    gl_Position = MVP * vec4(vPos, 0.0, 1.0);\n"
-"    color = vCol;\n"
-"}\n";
+#define NK_IMPLEMENTATION
+#include "ui/nuklear_setup.h"
+#include "ui/MenuPageMain.hpp"
+#include "ui/Canvas.hpp"
 
-static const char* fragment_shader_text =
-"varying vec3 color;\n"
-"void main()\n"
-"{\n"
-"    gl_FragColor = vec4(color, 1.0);\n"
-"}\n";
+#define NK_GLFW_GL2_IMPLEMENTATION
+#include <nuklear_glfw_gl2.h>
 
 static void error_callback(int error, const char* description) {
     fprintf(stderr, "Error: %s\n", description);
 }
 
-AbstractDemo::AbstractDemo() : vertices {
-    { -0.6f, -0.4f, 1.f, 0.f, 0.f },
-    {  0.6f, -0.4f, 0.f, 1.f, 0.f },
-    {   0.f,  0.6f, 0.f, 0.f, 1.f },
-    { 0.f, 0.0f, 1.f, 1.f, 1.f } } {
-}
+AbstractDemo::AbstractDemo() {}
 
 void AbstractDemo::run(const char *title) {
     GLFWwindow* window;
-    GLuint vertex_buffer, vertex_shader, fragment_shader, program;
-    GLint mvp_location, vpos_location, vcol_location;
-
     glfwSetErrorCallback(error_callback);
 
     if (!glfwInit())
@@ -79,43 +59,21 @@ void AbstractDemo::run(const char *title) {
 	});
 
     glfwMakeContextCurrent(window);
-	
-	gl3wInit();
-	if (!gl3wIsSupported(3, 0)) {
-		fprintf(stderr, "OpenGL 3.0 not supported\n");
-        exit(EXIT_FAILURE);
-	}
+    gladLoadGLLoader((GLADloadproc) glfwGetProcAddress);
     glfwSwapInterval(1);
 
-    glGenBuffers(1, &vertex_buffer);
-    glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_DYNAMIC_DRAW);
+    struct nk_context* nk;
+    struct nk_font_atlas* atlas;
 
-    vertex_shader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertex_shader, 1, &vertex_shader_text, NULL);
-    glCompileShader(vertex_shader);
+    nk = nk_glfw3_init(window, NK_GLFW3_INSTALL_CALLBACKS);
+    nk_glfw3_font_stash_begin(&atlas);
+    nk_glfw3_font_stash_end();
 
-    fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragment_shader, 1, &fragment_shader_text, NULL);
-    glCompileShader(fragment_shader);
+	MenuPageMain mainmenu(nk);
+	Canvas canvas(nk);
 
-    program = glCreateProgram();
-    glAttachShader(program, vertex_shader);
-    glAttachShader(program, fragment_shader);
-    glLinkProgram(program);
-
-    mvp_location = glGetUniformLocation(program, "MVP");
-    vpos_location = glGetAttribLocation(program, "vPos");
-    vcol_location = glGetAttribLocation(program, "vCol");
-
-    glEnableVertexAttribArray(vpos_location);
-    glVertexAttribPointer(vpos_location, 2, GL_FLOAT, GL_FALSE,
-                          sizeof(vertices[0]), (void*) 0);
-    glEnableVertexAttribArray(vcol_location);
-    glVertexAttribPointer(vcol_location, 3, GL_FLOAT, GL_FALSE,
-                          sizeof(vertices[0]), (void*) (sizeof(float) * 2));
-
-	glEnable(GL_PROGRAM_POINT_SIZE);
+	struct nk_rect area {0,0,0,0};
+	int width, height;
 	
 	double lastTime = glfwGetTime();
     while (!glfwWindowShouldClose(window)) {
@@ -123,26 +81,20 @@ void AbstractDemo::run(const char *title) {
 		double deltaTime = now - lastTime;
 		lastTime = now;
 		
-        float ratio;
-        int width, height;
-        mat4x4 m, p, mvp;
 
-        glfwGetFramebufferSize(window, &width, &height);
-        ratio = width / (float) height;
+        glfwGetWindowSize(window, &width, &height);
+        area.w = (float) width;
+		area.h = (float) height;
 
-        glViewport(0, 0, width, height);
         glClear(GL_COLOR_BUFFER_BIT);
-
-        mat4x4_identity(m);
-        mat4x4_ortho(p, -ratio, ratio, -1.f, 1.f, 1.f, -1.f);
-        mat4x4_mul(mvp, p, m);
-
-        glUseProgram(program);
-        glUniformMatrix4fv(mvp_location, 1, GL_FALSE, (const GLfloat*) mvp);
+        nk_glfw3_new_frame();
+		nk->style.window.fixed_background.data.color.a = 0;
 		
 		update((float)deltaTime);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_DYNAMIC_DRAW);
-        glDrawArrays(GL_POINTS, 0, MAX_PLAYERS);
+		canvas.update(area);
+		mainmenu.update(area);
+
+        nk_glfw3_render(NK_ANTI_ALIASING_ON, 10000, 1000);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
