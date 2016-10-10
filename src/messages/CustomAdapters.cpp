@@ -1,4 +1,4 @@
-#include "../generated/MessageAdapters.hpp"
+#include "../../generated/MessageAdapters.hpp"
 
 namespace eznet {
 	void readMessage(BufferReader& reader, MyCustomStruct& message) {

@@ -66,8 +66,8 @@ set_source_files_properties(${GENERATED_SOURCE_FILES} PROPERTIES GENERATED TRUE)
 #generate files
 add_custom_command(
 	OUTPUT ${GENERATED_SOURCE_FILES}
-	COMMAND message_generator ${CMAKE_CURRENT_SOURCE_DIR}/src/messages.def ${GENERATED_MESSAGE_PATH}
-	MAIN_DEPENDENCY ${CMAKE_CURRENT_SOURCE_DIR}/src/messages.def
+	COMMAND message_generator ${CMAKE_CURRENT_SOURCE_DIR}/src/messages/messages.def ${GENERATED_MESSAGE_PATH}
+	MAIN_DEPENDENCY ${CMAKE_CURRENT_SOURCE_DIR}/src/messages/messages.def
 	DEPENDS message_generator
 	WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
 	COMMENT "Generating message classes."

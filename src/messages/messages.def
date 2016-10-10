@@ -1,5 +1,5 @@
-include adapters "../src/CustomAdapters.hpp"
-include messages "../src/CustomMessages.hpp"
+include adapters "../src/messages/CustomAdapters.hpp"
+include messages "../src/messages/CustomMessages.hpp"
 
 struct PlayerListEntry
     field playerIndex uint8_t
