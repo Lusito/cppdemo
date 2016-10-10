@@ -1,14 +1,22 @@
-#include "MenuPageMain.hpp"
+#include <memory>
 
-MenuPageMain::MenuPageMain(nk_context* nk) : MenuPage(nk, "mainmenu") {
+#include "MenuPageMain.hpp"
+#include "../../state/StateManager.hpp"
+#include "../PlayState.hpp"
+
+MenuPageMain::MenuPageMain(StateManager& manager, nk_context* nk)
+	: MenuPage(manager, nk, "mainmenu") {
 	hostname[0] = '\0';
 }
 
 MenuPageMain::~MenuPageMain() { }
 
-void MenuPageMain::updateContent(struct nk_rect &area) {
+void MenuPageMain::updateContent() {
 	nk_layout_row_dynamic(nk, 30, 1);
 	if (nk_button_label(nk, "Create Server")) {
+		while(manager.pop())
+			continue;
+		manager.push(std::make_shared<PlayState>(manager, nk));
 	}
 	nk_layout_row_dynamic(nk, 30, 1);
 	if (nk_button_label(nk, "Find Servers in LAN")) {

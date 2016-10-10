@@ -3,8 +3,8 @@
 Canvas::Canvas(nk_context* nk) : nk(nk) { }
 
 Canvas::~Canvas() { }
-
-void Canvas::update(struct nk_rect &area) {
+	
+void Canvas::begin() {
     backupPadding = nk->style.window.padding;
     backupSpacing = nk->style.window.spacing;
     backupBackground = nk->style.window.fixed_background;
@@ -18,17 +18,16 @@ void Canvas::update(struct nk_rect &area) {
 		nk_layout_row_dynamic(nk, area.h, 1);
 		nk_widget(&area, nk);
 		painter = nk_window_get_canvas(nk);
-	
-		draw();
 	}
+}
+void Canvas::end() {
     nk_end(nk);
 	nk->style.window.spacing = backupPadding;
 	nk->style.window.padding = backupSpacing;
 	nk->style.window.fixed_background = backupBackground;
 }
 
-void Canvas::draw() {
-	struct nk_rect circle{50,200,50,50};
-	nk_color red{255,0,0,255};
-	nk_fill_circle(painter, circle, red);
+void Canvas::drawCircle(float x, float y, float radius, nk_color &color) {
+	struct nk_rect circle{x-radius,y-radius,radius*2,radius*2};
+	nk_fill_circle(painter, circle, color);
 }

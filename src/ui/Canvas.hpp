@@ -10,14 +10,20 @@ private:
     struct nk_vec2 backupSpacing;
     struct nk_vec2 backupPadding;
     struct nk_style_item backupBackground;
+	struct nk_rect area{0,0,0,0};
 
 public:
 	Canvas(nk_context* nk);
 	Canvas(const Canvas& orig) = delete;
 	~Canvas();
 	
-	void update(struct nk_rect &area);
+	void begin();
+	void end();
 	
-private:
-	void draw();
+	float setSize(float width, float height) {
+		area.w = width;
+		area.h = height;
+	}
+	
+	void drawCircle(float x, float y, float radius, nk_color &color);
 };

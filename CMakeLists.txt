@@ -1,16 +1,21 @@
 cmake_minimum_required(VERSION 2.6)
 
-project(eznet_examples)
+project(cppdemo)
 
 #eznet library
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/lib/eznet)
 include_directories(SYSTEM ${CMAKE_CURRENT_SOURCE_DIR}/lib/eznet/include)
 include_directories(SYSTEM ${CMAKE_CURRENT_SOURCE_DIR}/lib/eznet/lib/enet/include)
 
+#ecstasy library
+option(ECSTASY_BUILD_TESTS "" OFF)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/lib/ecstasy)
+include_directories(SYSTEM ${CMAKE_CURRENT_SOURCE_DIR}/lib/ecstasy/include)
+
 #glfw
-set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
-set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
-set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+option(GLFW_BUILD_DOCS "" OFF)
+option(GLFW_BUILD_TESTS "" OFF)
+option(GLFW_BUILD_EXAMPLES "" OFF)
 add_subdirectory(lib/glfw)
 include_directories(SYSTEM ${CMAKE_CURRENT_SOURCE_DIR}/lib/glfw/include)
 include_directories(SYSTEM ${CMAKE_CURRENT_SOURCE_DIR}/lib/glfw/deps)
@@ -20,7 +25,7 @@ find_package(OpenGL REQUIRED)
 include_directories(SYSTEM ${OPENGL_INCLUDE_DIR})
 
 #libraries to link
-set(LINKED_LIBRARIES eznet enet glfw ${OPENGL_gl_LIBRARY})
+set(LINKED_LIBRARIES eznet enet ecstasy glfw ${OPENGL_gl_LIBRARY})
 if(WIN32)
     set( LINKED_LIBRARIES
         ${LINKED_LIBRARIES}
@@ -39,28 +44,22 @@ set(GENERATED_SOURCE_FILES
     ${GENERATED_MESSAGE_PATH}/MessageConstants.hpp)
 
 #shared files
-file(GLOB_RECURSE UI_SOURCE_FILES
- ${CMAKE_CURRENT_SOURCE_DIR}/src/ui/*.cpp
- ${CMAKE_CURRENT_SOURCE_DIR}/src/ui/*.hpp
+file(GLOB_RECURSE SOURCE_FILES
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/*.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/*.h
 )
-set(SHARED_SOURCE_FILES
+list(APPEND SOURCE_FILES
     ${GENERATED_SOURCE_FILES}
-    ${UI_SOURCE_FILES}
     ${CMAKE_CURRENT_SOURCE_DIR}/lib/glfw/deps/glad.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/AbstractDemo.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/CustomAdapters.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/CustomAdapters.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/CustomMessages.hpp
 )
 
-add_executable(server ${SHARED_SOURCE_FILES} ${CMAKE_CURRENT_SOURCE_DIR}/src/Server.cpp)
-target_link_libraries(server ${LINKED_LIBRARIES})
+add_executable(demo ${SOURCE_FILES})
+target_link_libraries(demo ${LINKED_LIBRARIES})
 
-add_executable(client ${SHARED_SOURCE_FILES} ${CMAKE_CURRENT_SOURCE_DIR}/src/Client.cpp)
-target_link_libraries(client ${LINKED_LIBRARIES})
-
-set_property(TARGET client server PROPERTY CXX_STANDARD 14)
-set_property(TARGET client server PROPERTY CXX_STANDARD_REQUIRED ON)
+set_property(TARGET demo PROPERTY CXX_STANDARD 14)
+set_property(TARGET demo PROPERTY CXX_STANDARD_REQUIRED ON)
+target_compile_definitions(demo PUBLIC -DUSING_ECSTASY -DUSING_SIGNAL11)
 
 set_source_files_properties(${GENERATED_SOURCE_FILES} PROPERTIES GENERATED TRUE)
 
@@ -72,4 +71,4 @@ add_custom_command(
 	DEPENDS message_generator
 	WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
 	COMMENT "Generating message classes."
-	)
+)

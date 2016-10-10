@@ -7,9 +7,9 @@ private:
 	int hostnameLength = 0;
 
 public:
-	MenuPageMain(nk_context* nk);
+	MenuPageMain(StateManager& manager, nk_context* nk);
 	MenuPageMain(const MenuPageMain& orig) = delete;
 	virtual ~MenuPageMain();
 	
-	virtual void updateContent(struct nk_rect &area);
+	virtual void updateContent();
 };

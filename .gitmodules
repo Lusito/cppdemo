@@ -7,3 +7,8 @@
 	path = lib/glfw
 	url = https://github.com/glfw/glfw.git
 	ignore = untracked
+[submodule "lib/ecstasy"]
+	path = lib/ecstasy
+	url = https://github.com/Lusito/ecstasy.git
+	branch = feature/cmake
+	ignore = untracked
