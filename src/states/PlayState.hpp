@@ -26,6 +26,9 @@ public:
 	void update(float deltaTime);
 	void handleKey(int key, int scancode, int action, int mods) override;
 	void resize(int width, int height) override;
+	
+private:
+	Entity* createPlayer(float x, float y, const nk_color &color);
 };
 
 class ServerPlayState : public PlayState {

@@ -28,20 +28,10 @@ void PlayState::entered() {
 	while(menuStateManager.pop())
 		continue;
 	
-	auto e = engine.createEntity();
-	e->assign<PlayerComponent>();
-	e->assign<LocalPlayerComponent>();
-	e->assign<InputComponent>();
-	e->assign<PositionComponent>();
-	e->assign<VelocityComponent>();
-	e->assign<RenderComponent>();
-	auto pos = e->get<PositionComponent>();
-	pos->x = 150;
-	pos->y = 250;
-	auto render = e->get<RenderComponent>();
-	render->size = 25;
-	render->color = nk_rgba(255,0,0,255);
-	engine.addEntity(e);
+	auto localPlayer = createPlayer(150, 250, nk_rgba(255,0,0,255));
+	localPlayer->assign<LocalPlayerComponent>();
+	createPlayer(250, 250, nk_rgba(0,255,0,255));
+	createPlayer(200, 400, nk_rgba(0,0,255,255));
 }
 
 void PlayState::leaving() {
@@ -68,6 +58,23 @@ void PlayState::handleKey(int key, int scancode, int action, int mods) {
 void PlayState::resize(int width, int height) {
 	canvas.setSize(width, height);
 	menuStateManager.resize(width, height);
+}
+
+Entity* PlayState::createPlayer(float x, float y, const nk_color &color) {
+	auto e = engine.createEntity();
+	e->assign<PlayerComponent>();
+	e->assign<InputComponent>();
+	e->assign<PositionComponent>();
+	e->assign<VelocityComponent>();
+	e->assign<RenderComponent>();
+	auto pos = e->get<PositionComponent>();
+	pos->x = x;
+	pos->y = y;
+	auto render = e->get<RenderComponent>();
+	render->size = 25;
+	render->color = color;
+	engine.addEntity(e);
+	return e;
 }
 
 ServerPlayState::ServerPlayState(StateManager& manager, nk_context* nk,
