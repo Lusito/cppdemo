@@ -23,7 +23,7 @@ public:
 	
 	void entered() override;
 	void leaving() override;
-	void update(float deltaTime);
+	void update(float deltaTime) override;
 	void handleKey(int key, int scancode, int action, int mods) override;
 	void resize(int width, int height) override;
 	
