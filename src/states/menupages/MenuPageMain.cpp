@@ -16,7 +16,7 @@ void MenuPageMain::updateContent() {
 	if (nk_button_label(nk, "Create Server")) {
 		while(manager.pop())
 			continue;
-		manager.push(std::make_shared<PlayState>(manager, nk));
+		manager.push(std::make_shared<ServerPlayState>(manager, nk, 1234, "I am Root", "My Servername"));
 	}
 	nk_layout_row_dynamic(nk, 30, 1);
 	if (nk_button_label(nk, "Find Servers in LAN")) {

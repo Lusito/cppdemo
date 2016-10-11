@@ -13,9 +13,9 @@ void InputSystem::processEntity(Entity *entity, float deltaTime) {
 	
 	float x = 0, y = 0;
 	if(moveUp)
-		y += 1;
-	if(moveDown)
 		y -= 1;
+	if(moveDown)
+		y += 1;
 	if(moveLeft)
 		x -= 1;
 	if(moveRight)

@@ -2,7 +2,6 @@
 
 #include "MenuPageIngame.hpp"
 #include "../../state/StateManager.hpp"
-#include "../PlayState.hpp"
 
 MenuPageIngame::MenuPageIngame(StateManager& manager, nk_context* nk)
 	: MenuPage(manager, nk, "ingame") {

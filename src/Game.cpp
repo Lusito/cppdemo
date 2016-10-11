@@ -12,7 +12,6 @@
 #include <nuklear_glfw_gl2.h>
 
 #include "state/StateManager.hpp"
-#include "states/PlayState.hpp"
 #include "states/menupages/MenuPageMain.hpp"
 
 static void error_callback(int error, const char* description) {
@@ -76,7 +75,6 @@ void Game::run() {
         nk_glfw3_new_frame();
 		nk->style.window.fixed_background.data.color.a = 0;
 		
-		update((float)deltaTime);
 		stateManager.update(deltaTime);
 
         nk_glfw3_render(NK_ANTI_ALIASING_ON, 10000, 1000);
@@ -89,8 +87,4 @@ void Game::run() {
 
     glfwTerminate();
     exit(EXIT_SUCCESS);
-}
-
-void Game::update(float deltaTime) {
-	
 }
