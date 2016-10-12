@@ -20,7 +20,7 @@ public:
 	void begin();
 	void end();
 	
-	float setSize(float width, float height) {
+	void setSize(float width, float height) {
 		area.w = width;
 		area.h = height;
 	}

@@ -27,7 +27,7 @@ public:
 	void reveiling() override { show(true); }
 
 	
-	virtual void resize(int width, int height) {
+	void resize(int width, int height) override {
 		area.w = width;
 		area.h = height;
 	}
