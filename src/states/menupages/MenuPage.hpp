@@ -8,11 +8,11 @@ struct nk_context;
 class StateManager;
 class MenuPage : public AbstractState {
 protected:
+	StateManager& manager;
 	nk_context* nk;
 	std::string name;
 	nk_panel layout;
 	struct nk_rect area;
-	StateManager& manager;
 
 public:
 	MenuPage(StateManager& manager, nk_context* nk, const std::string &name);
