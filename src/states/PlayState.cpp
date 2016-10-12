@@ -64,13 +64,11 @@ Entity* PlayState::createPlayer(float x, float y, const nk_color &color) {
 	auto e = engine.createEntity();
 	e->assign<PlayerComponent>();
 	e->assign<InputComponent>();
-	e->assign<PositionComponent>();
+	auto pos = e->assign<PositionComponent>();
 	e->assign<VelocityComponent>();
-	e->assign<RenderComponent>();
-	auto pos = e->get<PositionComponent>();
+	auto render = e->assign<RenderComponent>();
 	pos->x = x;
 	pos->y = y;
-	auto render = e->get<RenderComponent>();
 	render->size = 25;
 	render->color = color;
 	engine.addEntity(e);
