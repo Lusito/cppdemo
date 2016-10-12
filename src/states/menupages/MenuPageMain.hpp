@@ -1,10 +1,10 @@
 #pragma once
 #include "MenuPage.hpp"
 
+class MenuPageCreateServer;
 class MenuPageMain : public MenuPage {
 private:
-	char hostname[256];
-	int hostnameLength = 0;
+	std::shared_ptr<MenuPageCreateServer> createServerMenu;
 
 public:
 	MenuPageMain(StateManager& manager, nk_context* nk);
