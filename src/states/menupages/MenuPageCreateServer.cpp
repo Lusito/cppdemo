@@ -8,7 +8,7 @@
 MenuPageCreateServer::MenuPageCreateServer(StateManager& manager, nk_context* nk)
 	: MenuPage(manager, nk, "create server") {
 	strcpy(servername, "My Server Name");
-	strcpy(username, "My User Name");
+	strcpy(username, "I am Root");
 	servernameLength = strlen(servername);
 	usernameLength = strlen(username);
 }
@@ -22,8 +22,15 @@ void MenuPageCreateServer::updateContent() {
 			continue;
 		manager.push(std::make_shared<ServerPlayState>(manager, nk, 1234, username, servername));
 	}
+	
+	nk_layout_row_dynamic(nk, 20, 1);
+	nk_label(nk, "Username:", NK_TEXT_ALIGN_LEFT|NK_TEXT_ALIGN_BOTTOM);
+	
 	nk_layout_row_dynamic(nk, 30, 1);
 	nk_edit_string(nk, NK_EDIT_SIMPLE, username, &usernameLength, 256, nk_filter_default);
+	
+	nk_layout_row_dynamic(nk, 20, 1);
+	nk_label(nk, "Servername:", NK_TEXT_ALIGN_LEFT|NK_TEXT_ALIGN_BOTTOM);
 	
 	nk_layout_row_dynamic(nk, 30, 1);
 	nk_edit_string(nk, NK_EDIT_SIMPLE, servername, &servernameLength, 256, nk_filter_default);
