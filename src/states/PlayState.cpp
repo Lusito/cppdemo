@@ -11,6 +11,7 @@
 #include "../components/PositionComponent.hpp"
 #include "../components/VelocityComponent.hpp"
 #include "../components/RenderComponent.hpp"
+#include "../Constants.hpp"
 
 PlayState::PlayState(StateManager& manager, nk_context* nk, bool isServer)
 	: manager(manager), canvas(nk), ingameMenu(std::make_shared<MenuPageIngame>(menuStateManager, nk)),
@@ -77,10 +78,27 @@ Entity* PlayState::createPlayer(float x, float y, const nk_color &color) {
 
 ServerPlayState::ServerPlayState(StateManager& manager, nk_context* nk,
 								 int port, const std::string userName, const std::string serverName)
-	: PlayState(manager, nk, true) {
+	: PlayState(manager, nk, true), discoveryServer(Constants::GAME_NAME),
+		port(port), userName(userName), serverName(serverName) {
 }
 
 ServerPlayState::~ServerPlayState() { }
+
+void ServerPlayState::entered() {
+	PlayState::entered();
+	discoveryServer.start(Constants::DISCOVERY_PORT, serverName,
+						 port, Constants::MAX_SLOTS);
+}
+
+void ServerPlayState::leaving() {
+	PlayState::leaving();
+	discoveryServer.stop();
+}
+
+void ServerPlayState::update(float deltaTime) {
+	PlayState::update(deltaTime);
+	discoveryServer.update();
+}
 
 ClientPlayState::ClientPlayState(StateManager& manager, nk_context* nk,
 								 const std::string hostName, int port, const std::string userName)

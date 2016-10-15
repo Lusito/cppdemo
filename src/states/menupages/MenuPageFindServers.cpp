@@ -3,9 +3,10 @@
 #include "MenuPageFindServers.hpp"
 #include "../../state/StateManager.hpp"
 #include <string.h>
+#include "../../Constants.hpp"
 
 MenuPageFindServers::MenuPageFindServers(StateManager& manager, nk_context* nk)
-	: MenuPage(manager, nk, "find servers") {
+	: MenuPage(manager, nk, "find servers"), discoveryClient(Constants::GAME_NAME) {
 }
 
 MenuPageFindServers::~MenuPageFindServers() { }
@@ -13,9 +14,34 @@ MenuPageFindServers::~MenuPageFindServers() { }
 void MenuPageFindServers::updateContent() {
 	nk_layout_row_dynamic(nk, 30, 1);
 	nk_label(nk, "Find Servers in LAN", NK_TEXT_ALIGN_CENTERED|NK_TEXT_ALIGN_BOTTOM);
-	
+
+	discoveryClient.update();
+	if(discoveryClient.getServersChanged())
+		servers = discoveryClient.getServers();
+	for (auto& server : servers) {
+		nk_layout_row_dynamic(nk, 30, 1);
+		//fixme: generate label when servers changed?
+		uint8_t maxSlots = server.getMaxSlots();
+		uint8_t usedSlots = maxSlots - server.getAvailableSlots();
+		std::string name = server.getServerName() + " ("
+			+ std::to_string(usedSlots) + "/" + std::to_string(maxSlots) + ")";
+		if (nk_button_label(nk, name.c_str())) {
+			//fixme: connect to  server.getHostname(), server.getPort()
+		}
+	}
+
 	nk_layout_row_dynamic(nk, 30, 1);
 	if (nk_button_label(nk, "Back")) {
 		manager.pop();
+	}
+}
+
+void MenuPageFindServers::show(bool visible) {
+	MenuPage::show(visible);
+	if(visible) {
+		discoveryClient.start(Constants::DISCOVERY_PORT);
+		servers = discoveryClient.getServers();
+	} else {
+		discoveryClient.stop();
 	}
 }

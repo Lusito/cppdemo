@@ -3,6 +3,7 @@
 #include "../state/AbstractState.hpp"
 #include "../ui/Canvas.hpp"
 #include <ecstasy/core/Engine.hpp>
+#include <eznet/DiscoveryServer.hpp>
 
 class MenuPageIngame;
 class PlayState : public AbstractState {
@@ -32,11 +33,21 @@ private:
 };
 
 class ServerPlayState : public PlayState {
+private:
+	eznet::DiscoveryServer discoveryServer;
+	uint16_t port;
+	std::string userName;
+	std::string serverName;
+
 public:
 	ServerPlayState(StateManager& manager, nk_context* nk,
 				 int port, const std::string userName, const std::string serverName);
 	ServerPlayState(const PlayState& orig) = delete;
 	virtual ~ServerPlayState();
+	
+	void entered() override;
+	void leaving() override;
+	void update(float deltaTime) override;
 };
 
 class ClientPlayState : public PlayState {
