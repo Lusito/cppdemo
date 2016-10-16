@@ -1,12 +1,14 @@
 #include <memory>
 
 #include "MenuPageFindServers.hpp"
+#include "MenuPageJoinServer.hpp"
 #include "../../state/StateManager.hpp"
 #include <string.h>
 #include "../../Constants.hpp"
 
 MenuPageFindServers::MenuPageFindServers(StateManager& manager, nk_context* nk)
 	: MenuPage(manager, nk, "find servers"), discoveryClient(Constants::GAME_NAME) {
+	joinServerMenu = std::make_shared<MenuPageJoinServer>(manager, nk);
 }
 
 MenuPageFindServers::~MenuPageFindServers() { }
@@ -26,7 +28,9 @@ void MenuPageFindServers::updateContent() {
 		std::string name = server.getServername() + " ("
 			+ std::to_string(usedSlots) + "/" + std::to_string(maxSlots) + ")";
 		if (nk_button_label(nk, name.c_str())) {
-			//fixme: connect to  server.getHostname(), server.getPort()
+			//fixme: server.getPort()
+			joinServerMenu->setHostname(server.getHostname());
+			manager.push(joinServerMenu);
 		}
 	}
 

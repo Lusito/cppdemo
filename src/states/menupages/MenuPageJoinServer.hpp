@@ -14,4 +14,5 @@ public:
 	virtual ~MenuPageJoinServer();
 	
 	virtual void updateContent();
+	void setHostname(const std::string &hostname);
 };

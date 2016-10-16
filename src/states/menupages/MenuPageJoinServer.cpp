@@ -42,3 +42,7 @@ void MenuPageJoinServer::updateContent() {
 		manager.push(std::make_shared<ClientPlayState>(manager, nk, hostname, 1234, username));
 	}
 }
+void MenuPageJoinServer::setHostname(const std::string &hostname_) {
+	strcpy(hostname, hostname_.c_str());
+	hostnameLength = strlen(hostname);
+}
