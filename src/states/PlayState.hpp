@@ -47,6 +47,7 @@ private:
 	uint16_t port;
 	std::string servername;
 	NetPlayerInfos playerInfos;
+	ConnectionScope connectionScope;
 
 public:
 	ServerPlayState(StateManager& manager, nk_context* nk,
@@ -57,6 +58,10 @@ public:
 	void entered() override;
 	void leaving() override;
 	void update(float deltaTime) override;
+
+private:
+	void onClientConnected(NetPlayerInfo *info);
+	void onClientDisconnected(NetPlayerInfo *info);
 };
 
 class ClientPlayState : public PlayState {

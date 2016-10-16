@@ -16,6 +16,7 @@
 #include "../net/ServerMessageHandler.hpp"
 #include "../net/ClientConnectHandler.hpp"
 #include "../net/ClientMessageHandler.hpp"
+#include "../Signals.hpp"
 
 PlayState::PlayState(StateManager& manager, nk_context* nk, bool isServer)
 	: manager(manager), canvas(nk), ingameMenu(std::make_shared<MenuPageIngame>(menuStateManager, nk)),
@@ -84,15 +85,26 @@ ServerPlayState::ServerPlayState(StateManager& manager, nk_context* nk,
 								 uint16_t port, const std::string username, const std::string servername)
 	: PlayState(manager, nk, true), discoveryServer(Constants::GAME_NAME),
 		port(port), servername(servername), playerInfos(username) {
+	connectionScope += Signals::getInstance()->clientConnected.connect(this, &ServerPlayState::onClientConnected);
+	connectionScope += Signals::getInstance()->clientDisconnected.connect(this, &ServerPlayState::onClientDisconnected);
 }
 
 ServerPlayState::~ServerPlayState() { }
+
+void ServerPlayState::onClientConnected(NetPlayerInfo *info) {
+	discoveryServer.setAvailableSlots(discoveryServer.getAvailableSlots() - 1);
+}
+
+void ServerPlayState::onClientDisconnected(NetPlayerInfo *info) {
+	discoveryServer.setAvailableSlots(discoveryServer.getAvailableSlots() + 1);
+}
 
 void ServerPlayState::entered() {
 	PlayState::entered();
 	//Fixme: handle false return values
 	discoveryServer.start(Constants::DISCOVERY_PORT, servername,
 						 port, Constants::MAX_SLOTS);
+	discoveryServer.setAvailableSlots(discoveryServer.getAvailableSlots() - 1);
 	connection.connect("", port, Constants::MAX_SLOTS, static_cast<uint8_t>(NetChannel::COUNT));
 	connectHandler = std::make_shared<ServerConnectHandler>(playerInfos);
 	messageHandler = std::make_shared<ServerMessageHandler>(connection.getHost(), playerInfos);
