@@ -2,13 +2,23 @@
 #include "../../generated/MessageAdapters.hpp"
 #include "../Signals.hpp"
 #include "../Constants.hpp"
+#include "../EntityFactory.hpp"
+#include "../components/PlayerComponent.hpp"
+#include "../components/VelocityComponent.hpp"
+#include "../components/PositionComponent.hpp"
+#include <ecstasy/core/Engine.hpp>
+#include <ecstasy/core/Entity.hpp>
 #include <enet/enet.h>
 #include <iostream>
+#include <math.h>
 
-ClientMessageHandler::ClientMessageHandler(const std::string &username, ENetPeer* peer)
-	: username(username), messageWriter(Constants::MAX_MESSAGE_SIZE), peer(peer) {
+ClientMessageHandler::ClientMessageHandler(const std::string &username, ENetPeer* peer, Engine &engine)
+	: username(username), messageWriter(Constants::MAX_MESSAGE_SIZE), peer(peer), engine(engine) {
 	connectionScope += Signals::getInstance()->serverConnected.connect(this, &ClientMessageHandler::onServerConnected);
 	putCallback(this, &ClientMessageHandler::handleHandshakeServerMessage);
+	putCallback(this, &ClientMessageHandler::handleCreatePlayersMessage);
+	putCallback(this, &ClientMessageHandler::handleDestroyPlayerMessage);
+	putCallback(this, &ClientMessageHandler::handleUpdatePlayersMessage);
 }
 
 ClientMessageHandler::~ClientMessageHandler() { }
@@ -25,7 +35,71 @@ void ClientMessageHandler::handleHandshakeServerMessage(eznet::HandshakeServerMe
 		std::cout << player.name << std::endl;
 	}
 }
+void ClientMessageHandler::handleCreatePlayersMessage(eznet::CreatePlayersMessage& message, ENetEvent& event) {
+	for (auto& entry : message.entities) {
+		std::cout << "entity " << std::to_string(entry.entityId) << " created" << std::endl;
+		auto entity = EntityFactory::createPlayer(engine, entry.x, entry.y, entry.color);
+		auto vel = entity->get<VelocityComponent>();
+		if(vel) {
+			vel->x = entry.velX;
+			vel->y = entry.velY;
+		}
+		mapEntity(entry.entityId, entity);
+	}
+}
+
+void ClientMessageHandler::handleDestroyPlayerMessage(eznet::DestroyPlayerMessage& message, ENetEvent& event) {
+	auto entity = getEntity(message.entityId);
+	if(entity) {
+		engine.removeEntity(entity);
+	}
+}
+
+void ClientMessageHandler::handleUpdatePlayersMessage(eznet::UpdatePlayersMessage& message, ENetEvent& event) {
+	for (auto& entry : message.updates) {
+		auto entity = getEntity(entry.entityId);
+		if(entity) {
+			auto player = entity->get<PlayerComponent>();
+			if(player && player->packetNumber < entry.packetNumber) {
+				player->packetNumber = entry.packetNumber;
+				auto pos = entity->get<PositionComponent>();
+				if(pos) {
+					if(fabs(pos->x - entry.x) > 5.0f)
+						pos->x = entry.x;
+					if(fabs(pos->y - entry.y) > 5.0f)
+						pos->y = entry.y;
+				}
+				auto vel = entity->get<VelocityComponent>();
+				if(vel) {
+					vel->x = entry.velX;
+					vel->y = entry.velY;
+				}
+			}
+		}
+	}
+}
 
 void ClientMessageHandler::send(NetChannel channel, ENetPacket* packet) {
 	enet_peer_send(peer, (enet_uint8)channel, packet);
+}
+
+Entity* ClientMessageHandler::getEntity(uint64_t id) {
+	auto it = entityMap.find(id);
+	if(it == entityMap.end()) {
+		// Fixme: Id does not exist, show error, disconnect
+		std::cerr << "Error: Id " << std::to_string(id) << " does not exist" << std::endl;
+		//		exit(EXIT_FAILURE);
+		return nullptr;
+	}
+	return engine.getEntity(it->second);
+}
+
+void ClientMessageHandler::mapEntity(uint64_t id, Entity* entity) {
+	if(entityMap.count(id) != 0) {
+		// Fixme: Id already exists, show error, disconnect
+		std::cerr << "Error: Id already exists" << std::endl;
+		//Fixme: exit
+		return;
+	}
+	entityMap[id] = entity->getId();
 }

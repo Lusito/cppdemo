@@ -3,14 +3,91 @@
 #include "../Signals.hpp"
 #include "../Constants.hpp"
 #include "NetPlayerInfo.hpp"
+#include "../components/PlayerComponent.hpp"
+#include "../components/RenderComponent.hpp"
+#include "../components/PositionComponent.hpp"
+#include "../components/VelocityComponent.hpp"
 #include <enet/enet.h>
+#include <ecstasy/core/Engine.hpp>
 
-ServerMessageHandler::ServerMessageHandler(ENetHost* host, NetPlayerInfos &playerInfos)
+const int max_size_per_packet = Constants::MAX_MESSAGE_SIZE - sizeof(eznet::MessageType::NUM_TYPES);
+
+ServerMessageHandler::ServerMessageHandler(ENetHost* host, NetPlayerInfos &playerInfos, Engine &engine)
 	: messageWriter(Constants::MAX_MESSAGE_SIZE), host(host), playerInfos(playerInfos) {
+	
+	players = engine.getEntitiesFor(Family::all<PlayerComponent, RenderComponent, PositionComponent, VelocityComponent>().get());
+
+	connectionScope += engine.entityAdded.connect(this, &ServerMessageHandler::onEntityAdded);
+	connectionScope += engine.entityAdded.connect(this, &ServerMessageHandler::onEntityRemoved);
+	
 	putCallback(this, &ServerMessageHandler::handleHandshakeClientMessage);
 }
 
 ServerMessageHandler::~ServerMessageHandler() { }
+
+void ServerMessageHandler::update(float deltaTime) {
+	nextBroadcast -= deltaTime;
+	if(nextBroadcast <= 0) {
+		nextBroadcast = 0.016f;
+		broadcastPlayerUpdates();
+	}
+}
+
+void ServerMessageHandler::broadcastPlayerUpdates() {
+	eznet::UpdatePlayersMessage message;
+	for(auto entity : *players) {
+		decltype(message.updates)::value_type entry;
+		entry.entityId = entity->getId();
+		entry.packetNumber = entity->get<PlayerComponent>()->packetNumber++;
+		auto pos = entity->get<PositionComponent>();
+		entry.x = pos->x;
+		entry.y = pos->y;
+		auto vel = entity->get<VelocityComponent>();
+		entry.velX = vel->x;
+		entry.velY = vel->y;
+		
+		if(getMessageSize(message) + getMessageSize(entry)>max_size_per_packet) {
+			broadcast(NetChannel::WORLD_UNRELIABLE, createPacket(messageWriter, message));
+			message.updates.clear();
+		}
+		message.updates.push_back(std::move(entry));
+	}
+	if(!message.updates.empty()) {
+		broadcast(NetChannel::WORLD_UNRELIABLE, createPacket(messageWriter, message));
+	}
+}
+
+void ServerMessageHandler::onEntityAdded(Entity *entity) {
+}
+
+void ServerMessageHandler::onEntityRemoved(Entity *entity) {
+}
+
+void ServerMessageHandler::sendCreatePlayers(ENetPeer* peer) {
+	eznet::CreatePlayersMessage message;
+	for(auto entity : *players) {
+		decltype(message.entities)::value_type entry;
+		entry.entityId = entity->getId();
+		auto render = entity->get<RenderComponent>();
+		entry.color = render->color;
+		entry.size = render->size;
+		auto pos = entity->get<PositionComponent>();
+		entry.x = pos->x;
+		entry.y = pos->y;
+		auto vel = entity->get<VelocityComponent>();
+		entry.velX = vel->x;
+		entry.velY = vel->y;
+		
+		if(getMessageSize(message) + getMessageSize(entry)>max_size_per_packet) {
+			send(peer, NetChannel::WORLD_RELIABLE, createPacket(messageWriter, message));
+			message.entities.clear();
+		}
+		message.entities.push_back(std::move(entry));
+	}
+	if(!message.entities.empty()) {
+		send(peer, NetChannel::WORLD_RELIABLE, createPacket(messageWriter, message));
+	}
+}
 
 void ServerMessageHandler::handleHandshakeClientMessage(eznet::HandshakeClientMessage& message, ENetEvent& event) {
 	NetPlayerInfo* info = static_cast<NetPlayerInfo*>(event.peer->data);
@@ -34,8 +111,8 @@ void ServerMessageHandler::handleHandshakeClientMessage(eznet::HandshakeClientMe
 		}
 	}
 
-
 	send(event.peer, NetChannel::WORLD_RELIABLE, createPacket(messageWriter, reply));
+	sendCreatePlayers(event.peer);
 }
 
 void ServerMessageHandler::send(ENetPeer* peer, NetChannel channel, ENetPacket* packet) {
