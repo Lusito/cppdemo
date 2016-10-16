@@ -36,24 +36,33 @@ class ServerPlayState : public PlayState {
 private:
 	eznet::DiscoveryServer discoveryServer;
 	uint16_t port;
-	std::string userName;
-	std::string serverName;
+	std::string username;
+	std::string servername;
 
 public:
 	ServerPlayState(StateManager& manager, nk_context* nk,
-				 int port, const std::string userName, const std::string serverName);
+				 uint16_t port, const std::string username, const std::string servername);
 	ServerPlayState(const PlayState& orig) = delete;
 	virtual ~ServerPlayState();
-	
+
 	void entered() override;
 	void leaving() override;
 	void update(float deltaTime) override;
 };
 
 class ClientPlayState : public PlayState {
+private:
+	std::string hostname;
+	uint16_t port;
+	std::string username;
+
 public:
 	ClientPlayState(StateManager& manager, nk_context* nk,
-				 const std::string hostName, int port, const std::string userName);
+				 const std::string hostname, uint16_t port, const std::string username);
 	ClientPlayState(const PlayState& orig) = delete;
 	virtual ~ClientPlayState();
+
+	void entered() override;
+	void leaving() override;
+	void update(float deltaTime) override;
 };

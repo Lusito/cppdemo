@@ -23,7 +23,7 @@ void MenuPageFindServers::updateContent() {
 		//fixme: generate label when servers changed?
 		uint8_t maxSlots = server.getMaxSlots();
 		uint8_t usedSlots = maxSlots - server.getAvailableSlots();
-		std::string name = server.getServerName() + " ("
+		std::string name = server.getServername() + " ("
 			+ std::to_string(usedSlots) + "/" + std::to_string(maxSlots) + ")";
 		if (nk_button_label(nk, name.c_str())) {
 			//fixme: connect to  server.getHostname(), server.getPort()

@@ -77,16 +77,16 @@ Entity* PlayState::createPlayer(float x, float y, const nk_color &color) {
 }
 
 ServerPlayState::ServerPlayState(StateManager& manager, nk_context* nk,
-								 int port, const std::string userName, const std::string serverName)
+								 uint16_t port, const std::string username, const std::string servername)
 	: PlayState(manager, nk, true), discoveryServer(Constants::GAME_NAME),
-		port(port), userName(userName), serverName(serverName) {
+		port(port), username(username), servername(servername) {
 }
 
 ServerPlayState::~ServerPlayState() { }
 
 void ServerPlayState::entered() {
 	PlayState::entered();
-	discoveryServer.start(Constants::DISCOVERY_PORT, serverName,
+	discoveryServer.start(Constants::DISCOVERY_PORT, servername,
 						 port, Constants::MAX_SLOTS);
 }
 
@@ -101,8 +101,20 @@ void ServerPlayState::update(float deltaTime) {
 }
 
 ClientPlayState::ClientPlayState(StateManager& manager, nk_context* nk,
-								 const std::string hostName, int port, const std::string userName)
-	: PlayState(manager, nk, false) {
+								 const std::string hostname, uint16_t port, const std::string username)
+	: PlayState(manager, nk, false), hostname(hostname), port(port), username(username) {
 }
 
 ClientPlayState::~ClientPlayState() { }
+
+void ClientPlayState::entered() {
+	PlayState::entered();
+}
+
+void ClientPlayState::leaving() {
+	PlayState::leaving();
+}
+
+void ClientPlayState::update(float deltaTime) {
+	PlayState::update(deltaTime);
+}
