@@ -105,7 +105,7 @@ void ServerPlayState::entered() {
 	discoveryServer.start(Constants::DISCOVERY_PORT, servername,
 						 port, Constants::MAX_SLOTS);
 	discoveryServer.setAvailableSlots(discoveryServer.getAvailableSlots() - 1);
-	connection.connect("", port, Constants::MAX_SLOTS, static_cast<uint8_t>(NetChannel::COUNT));
+	connection.connect("", port, discoveryServer.getAvailableSlots(), static_cast<uint8_t>(NetChannel::COUNT));
 	connectHandler = std::make_shared<ServerConnectHandler>(playerInfos);
 	messageHandler = std::make_shared<ServerMessageHandler>(connection.getHost(), playerInfos);
 	connection.setConnectHandler(connectHandler);
