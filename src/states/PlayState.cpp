@@ -12,6 +12,10 @@
 #include "../components/VelocityComponent.hpp"
 #include "../components/RenderComponent.hpp"
 #include "../Constants.hpp"
+#include "../net/ServerConnectHandler.hpp"
+#include "../net/ServerMessageHandler.hpp"
+#include "../net/ClientConnectHandler.hpp"
+#include "../net/ClientMessageHandler.hpp"
 
 PlayState::PlayState(StateManager& manager, nk_context* nk, bool isServer)
 	: manager(manager), canvas(nk), ingameMenu(std::make_shared<MenuPageIngame>(menuStateManager, nk)),
@@ -79,15 +83,21 @@ Entity* PlayState::createPlayer(float x, float y, const nk_color &color) {
 ServerPlayState::ServerPlayState(StateManager& manager, nk_context* nk,
 								 uint16_t port, const std::string username, const std::string servername)
 	: PlayState(manager, nk, true), discoveryServer(Constants::GAME_NAME),
-		port(port), username(username), servername(servername) {
+		port(port), servername(servername), playerInfos(username) {
 }
 
 ServerPlayState::~ServerPlayState() { }
 
 void ServerPlayState::entered() {
 	PlayState::entered();
+	//Fixme: handle false return values
 	discoveryServer.start(Constants::DISCOVERY_PORT, servername,
 						 port, Constants::MAX_SLOTS);
+	connection.connect("", port, Constants::MAX_SLOTS, static_cast<uint8_t>(NetChannel::COUNT));
+	connectHandler = std::make_shared<ServerConnectHandler>(playerInfos);
+	messageHandler = std::make_shared<ServerMessageHandler>(connection.getHost(), playerInfos);
+	connection.setConnectHandler(connectHandler);
+	connection.setMessageHandler(messageHandler);
 }
 
 void ServerPlayState::leaving() {
@@ -98,6 +108,7 @@ void ServerPlayState::leaving() {
 void ServerPlayState::update(float deltaTime) {
 	PlayState::update(deltaTime);
 	discoveryServer.update();
+	connection.update();
 }
 
 ClientPlayState::ClientPlayState(StateManager& manager, nk_context* nk,
@@ -109,6 +120,12 @@ ClientPlayState::~ClientPlayState() { }
 
 void ClientPlayState::entered() {
 	PlayState::entered();
+	//Fixme: handle false return value
+	connection.connect(hostname, port, static_cast<uint8_t>(NetChannel::COUNT));
+	connectHandler = std::make_shared<ClientConnectHandler>();
+	messageHandler = std::make_shared<ClientMessageHandler>(username, connection.getPeer());
+	connection.setConnectHandler(connectHandler);
+	connection.setMessageHandler(messageHandler);
 }
 
 void ClientPlayState::leaving() {
@@ -117,4 +134,5 @@ void ClientPlayState::leaving() {
 
 void ClientPlayState::update(float deltaTime) {
 	PlayState::update(deltaTime);
+	connection.update();
 }

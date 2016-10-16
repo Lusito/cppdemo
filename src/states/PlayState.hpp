@@ -2,12 +2,18 @@
 #include "../state/StateManager.hpp"
 #include "../state/AbstractState.hpp"
 #include "../ui/Canvas.hpp"
+#include "../net/NetPlayerInfo.hpp"
 #include <ecstasy/core/Engine.hpp>
+#include <eznet/Connection.hpp>
 #include <eznet/DiscoveryServer.hpp>
 
 class MenuPageIngame;
+class ServerConnectHandler;
+class ServerMessageHandler;
+class ClientConnectHandler;
+class ClientMessageHandler;
 class PlayState : public AbstractState {
-private:
+protected:
 	StateManager& manager;
 	StateManager menuStateManager;
 	Canvas canvas;
@@ -35,9 +41,12 @@ private:
 class ServerPlayState : public PlayState {
 private:
 	eznet::DiscoveryServer discoveryServer;
+	eznet::ServerConnection connection;
+	std::shared_ptr<ServerConnectHandler> connectHandler;
+	std::shared_ptr<ServerMessageHandler> messageHandler;
 	uint16_t port;
-	std::string username;
 	std::string servername;
+	NetPlayerInfos playerInfos;
 
 public:
 	ServerPlayState(StateManager& manager, nk_context* nk,
@@ -55,6 +64,9 @@ private:
 	std::string hostname;
 	uint16_t port;
 	std::string username;
+	eznet::ClientConnection connection;
+	std::shared_ptr<ClientConnectHandler> connectHandler;
+	std::shared_ptr<ClientMessageHandler> messageHandler;
 
 public:
 	ClientPlayState(StateManager& manager, nk_context* nk,

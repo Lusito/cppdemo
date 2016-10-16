@@ -6,7 +6,8 @@ struct PlayerListEntry
     field name std::string
 
 message HandshakeServer !reliable
-    field PlayerIndex uint8_t
+    field status ServerStatus
+    field playerIndex uint8_t
     field[] playerList PlayerListEntry
 
 message HandshakeClient !reliable
