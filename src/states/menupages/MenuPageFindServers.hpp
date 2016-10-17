@@ -8,6 +8,7 @@ private:
 	eznet::DiscoveryClient discoveryClient;
 	std::vector<eznet::ServerDescription> servers;
 	std::shared_ptr<MenuPageJoinServer> joinServerMenu;
+	std::string countLabel;
 
 public:
 	MenuPageFindServers(StateManager& manager, nk_context* nk);
@@ -15,6 +16,7 @@ public:
 	virtual ~MenuPageFindServers();
 	
 	void updateContent() override;
+	void onServersChanged();
 	
 	void show(bool visible) override;
 };
