@@ -5,6 +5,7 @@
 #include "../../state/StateManager.hpp"
 #include <string.h>
 #include "../../Constants.hpp"
+#include "../../Signals.hpp"
 
 MenuPageFindServers::MenuPageFindServers(StateManager& manager, nk_context* nk)
 	: MenuPage(manager, nk, "find servers"), discoveryClient(Constants::GAME_NAME) {
@@ -43,8 +44,10 @@ void MenuPageFindServers::updateContent() {
 void MenuPageFindServers::show(bool visible) {
 	MenuPage::show(visible);
 	if(visible) {
-		discoveryClient.start(Constants::DISCOVERY_PORT);
-		servers = discoveryClient.getServers();
+		if(!discoveryClient.start(Constants::DISCOVERY_PORT))
+			Signals::getInstance()->error.emit("Could not start discovery client");
+		else
+			servers = discoveryClient.getServers();
 	} else {
 		discoveryClient.stop();
 	}

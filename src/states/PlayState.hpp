@@ -12,12 +12,14 @@ class ServerConnectHandler;
 class ServerMessageHandler;
 class ClientConnectHandler;
 class ClientMessageHandler;
+class MenuPageConnecting;
 class PlayState : public AbstractState {
 protected:
 	StateManager& manager;
 	StateManager menuStateManager;
 	Canvas canvas;
 	std::shared_ptr<MenuPageIngame> ingameMenu;
+	std::shared_ptr<MenuPageConnecting> connectingMenu;
 	Engine engine;
 	bool isServer;
 
@@ -79,4 +81,5 @@ public:
 	void entered() override;
 	void leaving() override;
 	void update(float deltaTime) override;
+	void handleKey(int key, int scancode, int action, int mods) override;
 };

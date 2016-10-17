@@ -37,8 +37,7 @@ void MenuPageCreateServer::updateContent() {
 		manager.pop();
 	}
 	if (nk_button_label(nk, "Start")) {
-		while(manager.pop())
-			continue;
+		manager.pop();
 		manager.push(std::make_shared<ServerPlayState>(manager, nk, 1234, username, servername));
 	}
 }

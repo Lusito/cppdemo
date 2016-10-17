@@ -37,8 +37,7 @@ void MenuPageJoinServer::updateContent() {
 		manager.pop();
 	}
 	if (nk_button_label(nk, "Connect")) {
-		while(manager.pop())
-			continue;
+		manager.pop();
 		manager.push(std::make_shared<ClientPlayState>(manager, nk, hostname, 1234, username));
 	}
 }

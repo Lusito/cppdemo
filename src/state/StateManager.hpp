@@ -17,6 +17,7 @@ public:
 	void push(std::shared_ptr<AbstractState> state);
 	bool pop();
 	bool empty() const { return states.empty(); }
+	auto size() const { return states.size(); }
 
 	void update(float deltaTime);
 	void handleKey(int key, int scancode, int action, int mods);

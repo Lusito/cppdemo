@@ -1,5 +1,6 @@
 #include "PlayState.hpp"
 #include "menupages/MenuPageIngame.hpp"
+#include "menupages/MenuPageConnecting.hpp"
 #include "GLFW/glfw3.h"
 #include "../systems/ApplyInputSystem.hpp"
 #include "../systems/InputSystem.hpp"
@@ -21,7 +22,7 @@
 
 PlayState::PlayState(StateManager& manager, nk_context* nk, bool isServer)
 	: manager(manager), canvas(nk), ingameMenu(std::make_shared<MenuPageIngame>(menuStateManager, nk)),
-	isServer(isServer) {
+	connectingMenu(std::make_shared<MenuPageConnecting>(menuStateManager, nk)), isServer(isServer) {
 	
 	engine.addSystem<InputSystem>();
 	if(isServer)
@@ -89,15 +90,20 @@ void ServerPlayState::entered() {
 	EntityFactory::createPlayer(engine, 250, 250, nk_rgba(0,255,0,255));
 	EntityFactory::createPlayer(engine, 200, 400, nk_rgba(0,0,255,255));
 	
-	//Fixme: handle false return values
-	discoveryServer.start(Constants::DISCOVERY_PORT, servername,
-						 port, Constants::MAX_SLOTS);
-	discoveryServer.setAvailableSlots(discoveryServer.getAvailableSlots() - 1);
-	connection.connect("", port, discoveryServer.getAvailableSlots(), static_cast<uint8_t>(NetChannel::COUNT));
-	connectHandler = std::make_shared<ServerConnectHandler>(playerInfos);
-	messageHandler = std::make_shared<ServerMessageHandler>(connection.getHost(), playerInfos, engine);
-	connection.setConnectHandler(connectHandler);
-	connection.setMessageHandler(messageHandler);
+	if(!discoveryServer.start(Constants::DISCOVERY_PORT, servername,
+						 port, Constants::MAX_SLOTS))
+		Signals::getInstance()->error.emit("Could not start discovery server");
+	else {
+		discoveryServer.setAvailableSlots(discoveryServer.getAvailableSlots() - 1);
+		if(!connection.connect("", port, discoveryServer.getAvailableSlots(), static_cast<uint8_t>(NetChannel::COUNT)))
+			Signals::getInstance()->error.emit("Could not start server");
+		else {
+			connectHandler = std::make_shared<ServerConnectHandler>(playerInfos);
+			messageHandler = std::make_shared<ServerMessageHandler>(connection.getHost(), playerInfos, engine);
+			connection.setConnectHandler(connectHandler);
+			connection.setMessageHandler(messageHandler);
+		}
+	}
 }
 
 void ServerPlayState::leaving() {
@@ -121,12 +127,16 @@ ClientPlayState::~ClientPlayState() { }
 
 void ClientPlayState::entered() {
 	PlayState::entered();
-	//Fixme: handle false return value
-	connection.connect(hostname, port, static_cast<uint8_t>(NetChannel::COUNT));
-	connectHandler = std::make_shared<ClientConnectHandler>();
-	messageHandler = std::make_shared<ClientMessageHandler>(username, connection.getPeer(), engine);
-	connection.setConnectHandler(connectHandler);
-	connection.setMessageHandler(messageHandler);
+	if(!connection.connect(hostname, port, static_cast<uint8_t>(NetChannel::COUNT)))
+		Signals::getInstance()->error.emit("Could not start client");
+	else {
+		connectHandler = std::make_shared<ClientConnectHandler>();
+		messageHandler = std::make_shared<ClientMessageHandler>(username, connection.getPeer(), engine);
+		connection.setConnectHandler(connectHandler);
+		connection.setMessageHandler(messageHandler);
+		connectingMenu->setMessage("Host: " + hostname);
+		menuStateManager.push(connectingMenu);
+	}
 }
 
 void ClientPlayState::leaving() {
@@ -136,4 +146,9 @@ void ClientPlayState::leaving() {
 void ClientPlayState::update(float deltaTime) {
 	PlayState::update(deltaTime);
 	connection.update();
+}
+
+void ClientPlayState::handleKey(int key, int scancode, int action, int mods) {
+	if(connection.isConnected())
+		PlayState::handleKey(key, scancode, action, mods);
 }
