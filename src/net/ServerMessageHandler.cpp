@@ -7,13 +7,15 @@
 #include "../components/RenderComponent.hpp"
 #include "../components/PositionComponent.hpp"
 #include "../components/VelocityComponent.hpp"
+#include "../components/InputComponent.hpp"
+#include "../EntityFactory.hpp"
 #include <enet/enet.h>
 #include <ecstasy/core/Engine.hpp>
 
 const int max_size_per_packet = Constants::MAX_MESSAGE_SIZE - sizeof(eznet::MessageType::NUM_TYPES);
 
 ServerMessageHandler::ServerMessageHandler(ENetHost* host, NetPlayerInfos &playerInfos, Engine &engine)
-	: messageWriter(Constants::MAX_MESSAGE_SIZE), host(host), playerInfos(playerInfos) {
+	: engine(engine), messageWriter(Constants::MAX_MESSAGE_SIZE), host(host), playerInfos(playerInfos) {
 	
 	players = engine.getEntitiesFor(Family::all<PlayerComponent, RenderComponent, PositionComponent, VelocityComponent>().get());
 
@@ -23,6 +25,7 @@ ServerMessageHandler::ServerMessageHandler(ENetHost* host, NetPlayerInfos &playe
 	
 	putCallback(this, &ServerMessageHandler::handleHandshakeClientMessage);
 	putCallback(this, &ServerMessageHandler::handleChatMessage);
+	putCallback(this, &ServerMessageHandler::handleInputUpdateMessage);
 }
 
 ServerMessageHandler::~ServerMessageHandler() { }
@@ -106,10 +109,15 @@ void ServerMessageHandler::handleHandshakeClientMessage(eznet::HandshakeClientMe
 	auto signals = Signals::getInstance();
 	playerInfos.makeUniqueName(info);
 	signals->clientConnected.emit(info);
+	
+	// Create player
+	auto ent = EntityFactory::createPlayer(engine, 0, 0, nk_rgb(255,255,255)); //fixme: color, position
+	info->entityId = ent->getId();
 
 	// Send greeting back
 	eznet::HandshakeServerMessage reply;
 	reply.status = status;
+	reply.entityId = ent->getId();
 	reply.playerIndex = info->playerIndex;
 	for (int i=0; i<Constants::MAX_SLOTS; i++) {
 		auto& info = playerInfos.slots[i];
@@ -121,14 +129,26 @@ void ServerMessageHandler::handleHandshakeClientMessage(eznet::HandshakeClientMe
 		}
 	}
 
-	send(event.peer, NetChannel::WORLD_RELIABLE, createPacket(messageWriter, reply));
 	sendCreatePlayers(event.peer);
+	send(event.peer, NetChannel::WORLD_RELIABLE, createPacket(messageWriter, reply));
 }
 
 void ServerMessageHandler::handleChatMessage(eznet::ChatMessage& message, ENetEvent& event) {
 	message.username = static_cast<NetPlayerInfo*>(event.peer->data)->name;
 	broadcast(NetChannel::CHAT, createPacket(messageWriter, message));
 	Signals::getInstance()->chat.emit(message.message, message.username);
+}
+
+void ServerMessageHandler::handleInputUpdateMessage(eznet::InputUpdateMessage& message, ENetEvent& event) {
+	auto info = static_cast<NetPlayerInfo*>(event.peer->data);
+	auto entity = engine.getEntity(info->entityId);
+	if(entity) {
+		auto input = entity->get<InputComponent>();
+		if(input) {
+			input->x = message.moveX;
+			input->y = message.moveY;
+		}
+	}
 }
 
 void ServerMessageHandler::send(ENetPeer* peer, NetChannel channel, ENetPacket* packet) {

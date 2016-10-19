@@ -26,12 +26,16 @@ private:
 	ENetPeer* peer;
 	ECS::Engine &engine;
 	std::map<uint64_t, uint64_t> entityMap;
+	const std::vector<ECS::Entity *> *localPlayers;
+	float nextBroadcast = 0;
 
 public:
 	ClientMessageHandler(const std::string &username, ENetPeer* peer, ECS::Engine &engine);
 	ClientMessageHandler(const ClientMessageHandler& orig) = delete;
 	~ClientMessageHandler();
 	
+	void update(float deltaTime);
+
 private:
 	// Signal callbacks
 	void onServerConnected();
@@ -45,6 +49,7 @@ private:
 	void handleChatMessage(eznet::ChatMessage& message, ENetEvent& event);
 	
 	// Utility
+	void sendInputUpdate();
 	void send(NetChannel channel, ENetPacket* packet);
 	
 	ECS::Entity* getEntity(uint64_t id);

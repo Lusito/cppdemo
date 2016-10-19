@@ -18,6 +18,7 @@ namespace ECS {
 }
 class ServerMessageHandler : public eznet::MessageHandler {
 private:
+	ECS::Engine &engine;
 	ServerStatus status = ServerStatus::INIT;
 	eznet::BufferWriter messageWriter;
 	ENetHost* host;
@@ -42,6 +43,7 @@ private:
 	// Message handlers
 	void handleHandshakeClientMessage(eznet::HandshakeClientMessage& message, ENetEvent& event);
 	void handleChatMessage(eznet::ChatMessage& message, ENetEvent& event);
+	void handleInputUpdateMessage(eznet::InputUpdateMessage& message, ENetEvent& event);
 	
 	// Utility
 	void broadcastPlayerUpdates();

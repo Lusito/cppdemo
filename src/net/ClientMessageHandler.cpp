@@ -3,6 +3,8 @@
 #include "../Signals.hpp"
 #include "../Constants.hpp"
 #include "../EntityFactory.hpp"
+#include "../components/LocalPlayerComponent.hpp"
+#include "../components/InputComponent.hpp"
 #include "../components/PlayerComponent.hpp"
 #include "../components/VelocityComponent.hpp"
 #include "../components/PositionComponent.hpp"
@@ -13,7 +15,9 @@
 #include <math.h>
 
 ClientMessageHandler::ClientMessageHandler(const std::string &username, ENetPeer* peer, Engine &engine)
-	: username(username), messageWriter(Constants::MAX_MESSAGE_SIZE), peer(peer), engine(engine) {
+	: username(username), messageWriter(Constants::MAX_MESSAGE_SIZE), peer(peer), engine(engine) {	
+	localPlayers = engine.getEntitiesFor(Family::all<LocalPlayerComponent, InputComponent>().get());
+
 	connectionScope += Signals::getInstance()->serverConnected.connect(this, &ClientMessageHandler::onServerConnected);
 	connectionScope += Signals::getInstance()->submitChat.connect(this, &ClientMessageHandler::onSubmitChat);
 	
@@ -25,6 +29,14 @@ ClientMessageHandler::ClientMessageHandler(const std::string &username, ENetPeer
 }
 
 ClientMessageHandler::~ClientMessageHandler() { }
+
+void ClientMessageHandler::update(float deltaTime) {
+	nextBroadcast -= deltaTime;
+	if(nextBroadcast <= 0) {
+		nextBroadcast = 0.016f;
+		sendInputUpdate();
+	}
+}
 
 void ClientMessageHandler::onServerConnected() {
 	eznet::HandshakeClientMessage message;
@@ -43,6 +55,9 @@ void ClientMessageHandler::handleHandshakeServerMessage(eznet::HandshakeServerMe
 	for (auto& player : message.playerList) {
 		std::cout << player.name << std::endl;
 	}
+	auto ent = getEntity(message.entityId);
+	if(ent)
+		ent->assign<LocalPlayerComponent>();
 }
 void ClientMessageHandler::handleCreatePlayersMessage(eznet::CreatePlayersMessage& message, ENetEvent& event) {
 	for (auto& entry : message.entities) {
@@ -90,6 +105,17 @@ void ClientMessageHandler::handleUpdatePlayersMessage(eznet::UpdatePlayersMessag
 
 void ClientMessageHandler::handleChatMessage(eznet::ChatMessage& message, ENetEvent& event) {
 	Signals::getInstance()->chat.emit(message.message, message.username);
+}
+
+void ClientMessageHandler::sendInputUpdate() {
+	for(auto entity : *localPlayers) {
+		auto input = entity->get<InputComponent>();
+		eznet::InputUpdateMessage message;
+		message.moveX = input->x;
+		message.moveY = input->y;
+		send(NetChannel::INPUT_UNRELIABLE, createPacket(messageWriter, message));
+		break;
+	}
 }
 
 void ClientMessageHandler::send(NetChannel channel, ENetPacket* packet) {

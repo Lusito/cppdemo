@@ -159,6 +159,7 @@ void ClientPlayState::leaving() {
 void ClientPlayState::update(float deltaTime) {
 	PlayState::update(deltaTime);
 	connection.update();
+	messageHandler->update(deltaTime);
 }
 
 bool ClientPlayState::handleKey(int key, int scancode, int action, int mods) {

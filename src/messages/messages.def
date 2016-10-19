@@ -8,6 +8,7 @@ struct PlayerListEntry
 message HandshakeServer !reliable
     field status ServerStatus
     field playerIndex uint8_t
+    field entityId uint64_t
     field[] playerList PlayerListEntry
 
 message HandshakeClient !reliable
@@ -36,9 +37,13 @@ struct UpdatePlayersEntry
     field velX float
     field velY float
 
-message UpdatePlayers !reliable
+message UpdatePlayers !unsequenced
     field[] updates UpdatePlayersEntry
 
 message Chat !reliable
     field username std::string
     field message std::string
+
+message InputUpdate !unsequenced
+    field moveX float
+    field moveY float
