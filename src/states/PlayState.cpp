@@ -1,6 +1,7 @@
 #include "PlayState.hpp"
 #include "menupages/MenuPageIngame.hpp"
 #include "menupages/MenuPageConnecting.hpp"
+#include "menupages/MenuPageChat.hpp"
 #include "GLFW/glfw3.h"
 #include "../systems/ApplyInputSystem.hpp"
 #include "../systems/InputSystem.hpp"
@@ -22,7 +23,8 @@
 
 PlayState::PlayState(StateManager& manager, nk_context* nk, bool isServer)
 	: manager(manager), canvas(nk), ingameMenu(std::make_shared<MenuPageIngame>(menuStateManager, nk)),
-	connectingMenu(std::make_shared<MenuPageConnecting>(menuStateManager, nk)), isServer(isServer) {
+	connectingMenu(std::make_shared<MenuPageConnecting>(menuStateManager, nk)), 
+	chatMenu(std::make_shared<MenuPageChat>(menuStateManager, nk)), isServer(isServer) {
 	
 	engine.addSystem<InputSystem>();
 	if(isServer)
@@ -48,15 +50,23 @@ void PlayState::update(float deltaTime) {
 	menuStateManager.update(deltaTime);
 }
 
-void PlayState::handleKey(int key, int scancode, int action, int mods) {
-	if(key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE) {
-		if(menuStateManager.empty())
-			menuStateManager.push(ingameMenu);
-		else
+bool PlayState::handleKey(int key, int scancode, int action, int mods) {
+	if(!menuStateManager.empty()) {
+		if(key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE)
 			menuStateManager.pop();
+		menuStateManager.handleKey(key, scancode, action, mods);
+		return true;
+	} else {
+		if(key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE) {
+			menuStateManager.push(ingameMenu);
+			return true;
+		}
+		if(key == GLFW_KEY_ENTER && action == GLFW_RELEASE) {
+			menuStateManager.push(chatMenu);
+			return true;
+		}
 	}
-	menuStateManager.handleKey(key, scancode, action, mods);
-	engine.getSystem<InputSystem>()->handleKey(key, scancode, action, mods);
+	return engine.getSystem<InputSystem>()->handleKey(key, scancode, action, mods);
 }
 
 void PlayState::resize(int width, int height) {
@@ -148,7 +158,8 @@ void ClientPlayState::update(float deltaTime) {
 	connection.update();
 }
 
-void ClientPlayState::handleKey(int key, int scancode, int action, int mods) {
+bool ClientPlayState::handleKey(int key, int scancode, int action, int mods) {
 	if(connection.isConnected())
-		PlayState::handleKey(key, scancode, action, mods);
+		return PlayState::handleKey(key, scancode, action, mods);
+	return false;
 }

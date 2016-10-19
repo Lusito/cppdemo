@@ -31,20 +31,21 @@ void InputSystem::processEntity(Entity *entity, float deltaTime) {
 	input->y = y;
 }
 
-void InputSystem::handleKey(int key, int scancode, int action, int mods) {
+bool InputSystem::handleKey(int key, int scancode, int action, int mods) {
 	bool down = action != GLFW_RELEASE;
 	switch(key) {
 	case GLFW_KEY_UP:
 		moveUp = down;
-		break;
+		return true;
 	case GLFW_KEY_DOWN:
 		moveDown = down;
-		break;
+		return true;
 	case GLFW_KEY_LEFT:
 		moveLeft = down;
-		break;
+		return true;
 	case GLFW_KEY_RIGHT:
 		moveRight = down;
-		break;
+		return true;
 	}
+	return false;
 }

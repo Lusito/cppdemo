@@ -26,7 +26,6 @@ public:
 	void obscuring() override { show(false); }
 	void reveiling() override { show(true); }
 
-	
 	void resize(int width, int height) override {
 		area.w = width;
 		area.h = height;

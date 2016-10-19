@@ -13,5 +13,5 @@ public:
 	
 	void processEntity(Entity *entity, float deltaTime) override;
 	
-	void handleKey(int key, int scancode, int action, int mods);
+	bool handleKey(int key, int scancode, int action, int mods);
 };

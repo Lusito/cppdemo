@@ -40,11 +40,12 @@ void StateManager::update(float deltaTime) {
 	}
 }
 
-void StateManager::handleKey(int key, int scancode, int action, int mods) {
+bool StateManager::handleKey(int key, int scancode, int action, int mods) {
 	if(!states.empty()) {
 		auto back = states.back();
-		back->handleKey(key, scancode, action, mods);
+		return back->handleKey(key, scancode, action, mods);
 	}
+	return false;
 }
 
 void StateManager::resize(int width, int height) {

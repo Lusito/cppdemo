@@ -20,6 +20,6 @@ public:
 	auto size() const { return states.size(); }
 
 	void update(float deltaTime);
-	void handleKey(int key, int scancode, int action, int mods);
+	bool handleKey(int key, int scancode, int action, int mods);
 	void resize(int width, int height);
 };
