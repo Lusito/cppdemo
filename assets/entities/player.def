@@ -1,0 +1,7 @@
+add Position
+add Velocity
+add Input
+add Player
+add Render
+	set size 20
+	set color FF0000
