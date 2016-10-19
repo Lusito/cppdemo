@@ -3,7 +3,7 @@
 #include <string>
 
 enum class DisconnectReason : uint8_t;
-class NetPlayerInfo;
+struct NetPlayerInfo;
 
 struct Signals {
 	static Signals *getInstance() {

@@ -4,7 +4,7 @@
 #include "../../state/StateManager.hpp"
 #include "../PlayState.hpp"
 #include <string.h>
-#include <glfw/glfw3.h>
+#include <GLFW/glfw3.h>
 
 MenuPageChat::MenuPageChat(StateManager& manager, nk_context* nk)
 	: MenuPage(manager, nk, "chat") {
