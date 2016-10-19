@@ -42,7 +42,3 @@ message UpdatePlayers !reliable
 message Chat !reliable
     field username std::string
     field message std::string
-
-message MyCustom !reliable
-    field text std::string
-    field data MyCustomStruct
