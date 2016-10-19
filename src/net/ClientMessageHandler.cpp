@@ -15,10 +15,13 @@
 ClientMessageHandler::ClientMessageHandler(const std::string &username, ENetPeer* peer, Engine &engine)
 	: username(username), messageWriter(Constants::MAX_MESSAGE_SIZE), peer(peer), engine(engine) {
 	connectionScope += Signals::getInstance()->serverConnected.connect(this, &ClientMessageHandler::onServerConnected);
+	connectionScope += Signals::getInstance()->submitChat.connect(this, &ClientMessageHandler::onSubmitChat);
+	
 	putCallback(this, &ClientMessageHandler::handleHandshakeServerMessage);
 	putCallback(this, &ClientMessageHandler::handleCreatePlayersMessage);
 	putCallback(this, &ClientMessageHandler::handleDestroyPlayerMessage);
 	putCallback(this, &ClientMessageHandler::handleUpdatePlayersMessage);
+	putCallback(this, &ClientMessageHandler::handleChatMessage);
 }
 
 ClientMessageHandler::~ClientMessageHandler() { }
@@ -27,6 +30,12 @@ void ClientMessageHandler::onServerConnected() {
 	eznet::HandshakeClientMessage message;
 	message.name = username;
 	send(NetChannel::WORLD_RELIABLE, eznet::createPacket(messageWriter, message));
+}
+
+void ClientMessageHandler::onSubmitChat(const std::string &text) {
+	eznet::ChatMessage message;
+	message.message = text;
+	send(NetChannel::CHAT, eznet::createPacket(messageWriter, message));
 }
 
 void ClientMessageHandler::handleHandshakeServerMessage(eznet::HandshakeServerMessage& message, ENetEvent& event) {
@@ -77,6 +86,10 @@ void ClientMessageHandler::handleUpdatePlayersMessage(eznet::UpdatePlayersMessag
 			}
 		}
 	}
+}
+
+void ClientMessageHandler::handleChatMessage(eznet::ChatMessage& message, ENetEvent& event) {
+	Signals::getInstance()->chat.emit(message.message, message.username);
 }
 
 void ClientMessageHandler::send(NetChannel channel, ENetPacket* packet) {

@@ -3,6 +3,7 @@
 #include "menupages/MenuPageConnecting.hpp"
 #include "menupages/MenuPageChat.hpp"
 #include "GLFW/glfw3.h"
+#include "../systems/ChatRenderSystem.hpp"
 #include "../systems/ApplyInputSystem.hpp"
 #include "../systems/InputSystem.hpp"
 #include "../systems/MovementSystem.hpp"
@@ -31,6 +32,7 @@ PlayState::PlayState(StateManager& manager, nk_context* nk, bool isServer)
 		engine.addSystem<ApplyInputSystem>();
 	engine.addSystem<MovementSystem>();
 	engine.addSystem<RenderSystem>(&canvas);
+	engine.addSystem<ChatRenderSystem>(nk);
 }
 
 PlayState::~PlayState() { }
@@ -72,6 +74,7 @@ bool PlayState::handleKey(int key, int scancode, int action, int mods) {
 void PlayState::resize(int width, int height) {
 	canvas.setSize(width, height);
 	menuStateManager.resize(width, height);
+	engine.getSystem<ChatRenderSystem>()->resize(width, height);
 }
 
 ServerPlayState::ServerPlayState(StateManager& manager, nk_context* nk,

@@ -19,8 +19,10 @@ ServerMessageHandler::ServerMessageHandler(ENetHost* host, NetPlayerInfos &playe
 
 	connectionScope += engine.entityAdded.connect(this, &ServerMessageHandler::onEntityAdded);
 	connectionScope += engine.entityAdded.connect(this, &ServerMessageHandler::onEntityRemoved);
+	connectionScope += Signals::getInstance()->submitChat.connect(this, &ServerMessageHandler::onSubmitChat);
 	
 	putCallback(this, &ServerMessageHandler::handleHandshakeClientMessage);
+	putCallback(this, &ServerMessageHandler::handleChatMessage);
 }
 
 ServerMessageHandler::~ServerMessageHandler() { }
@@ -61,6 +63,14 @@ void ServerMessageHandler::onEntityAdded(Entity *entity) {
 }
 
 void ServerMessageHandler::onEntityRemoved(Entity *entity) {
+}
+
+void ServerMessageHandler::onSubmitChat(const std::string &text) {
+	eznet::ChatMessage message;
+	message.message = text;
+	message.username = playerInfos.slots[0].name;
+	broadcast(NetChannel::CHAT, createPacket(messageWriter, message));
+	Signals::getInstance()->chat.emit(message.message, message.username);
 }
 
 void ServerMessageHandler::sendCreatePlayers(ENetPeer* peer) {
@@ -113,6 +123,12 @@ void ServerMessageHandler::handleHandshakeClientMessage(eznet::HandshakeClientMe
 
 	send(event.peer, NetChannel::WORLD_RELIABLE, createPacket(messageWriter, reply));
 	sendCreatePlayers(event.peer);
+}
+
+void ServerMessageHandler::handleChatMessage(eznet::ChatMessage& message, ENetEvent& event) {
+	message.username = static_cast<NetPlayerInfo*>(event.peer->data)->name;
+	broadcast(NetChannel::CHAT, createPacket(messageWriter, message));
+	Signals::getInstance()->chat.emit(message.message, message.username);
 }
 
 void ServerMessageHandler::send(ENetPeer* peer, NetChannel channel, ENetPacket* packet) {

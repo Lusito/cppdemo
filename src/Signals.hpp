@@ -16,4 +16,6 @@ struct Signals {
 	Signal<void (DisconnectReason reason)> serverDisconnected; // emitted on client
 	Signal<void (NetPlayerInfo *info)> clientConnected;// emitted on server
 	Signal<void (NetPlayerInfo *info)> clientDisconnected;// emitted on server
+	Signal<void (const std::string &message, const std::string &username)> chat;
+	Signal<void (const std::string &message)> submitChat;
 };

@@ -37,9 +37,11 @@ private:
 	// Signal callbacks
 	void onEntityAdded(Entity *entity);
 	void onEntityRemoved(Entity *entity);
+	void onSubmitChat(const std::string &message);
 	
 	// Message handlers
 	void handleHandshakeClientMessage(eznet::HandshakeClientMessage& message, ENetEvent& event);
+	void handleChatMessage(eznet::ChatMessage& message, ENetEvent& event);
 	
 	// Utility
 	void broadcastPlayerUpdates();

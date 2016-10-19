@@ -40,7 +40,8 @@ message UpdatePlayers !reliable
     field[] updates UpdatePlayersEntry
 
 message Chat !reliable
-    field command std::string
+    field username std::string
+    field message std::string
 
 message MyCustom !reliable
     field text std::string

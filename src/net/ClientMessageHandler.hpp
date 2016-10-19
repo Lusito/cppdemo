@@ -35,12 +35,14 @@ public:
 private:
 	// Signal callbacks
 	void onServerConnected();
+	void onSubmitChat(const std::string &message);
 	
 	// Message handlers
 	void handleHandshakeServerMessage(eznet::HandshakeServerMessage& message, ENetEvent& event);
 	void handleCreatePlayersMessage(eznet::CreatePlayersMessage& message, ENetEvent& event);
 	void handleDestroyPlayerMessage(eznet::DestroyPlayerMessage& message, ENetEvent& event);
 	void handleUpdatePlayersMessage(eznet::UpdatePlayersMessage& message, ENetEvent& event);
+	void handleChatMessage(eznet::ChatMessage& message, ENetEvent& event);
 	
 	// Utility
 	void send(NetChannel channel, ENetPacket* packet);
