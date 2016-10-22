@@ -3,6 +3,7 @@
 #include <GLFW/glfw3.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <iostream>
 
 #define NK_IMPLEMENTATION
 #include "ui/nuklear_setup.h"
@@ -14,6 +15,7 @@
 #include "state/StateManager.hpp"
 #include "states/menupages/MenuPageMain.hpp"
 #include <ecstasy/utils/EntityFactory.hpp>
+#include <ecstasy/utils/BlueprintParser.hpp>
 #include "components/ComponentFactories.hpp"
 #include "components/PlayerComponent.hpp"
 #include "components/LocalPlayerComponent.hpp"
@@ -37,17 +39,15 @@ auto createEntityFactory() {
 	factory->addComponentFactory<SimpleComponentFactory<PositionComponent>>("Position");
 	factory->addComponentFactory<SimpleComponentFactory<VelocityComponent>>("Velocity");
 
-	// Fixme: read blueprints from .def files instead.
-	auto playerBlueprint = std::make_shared<EntityBlueprint>();
-	auto renderBlueprint = std::make_shared<ComponentBlueprint>("Render");
-	renderBlueprint->set("size", "25");
-	renderBlueprint->set("color", "FF0000");
-	playerBlueprint->add(renderBlueprint);
-	playerBlueprint->add(std::make_shared<ComponentBlueprint>("Input"));
-	playerBlueprint->add(std::make_shared<ComponentBlueprint>("Player"));
-	playerBlueprint->add(std::make_shared<ComponentBlueprint>("Position"));
-	playerBlueprint->add(std::make_shared<ComponentBlueprint>("Velocity"));
-	factory->addEntityBlueprint("player", playerBlueprint);
+	BlueprintParser parser;
+	std::shared_ptr<EntityBlueprint> entityBlueprint;
+	std::string filename = "assets/entities/player.def";
+	std::string error = parser.parse(filename, entityBlueprint);
+	if(!error.empty()) {
+		std::cerr << "Error parsing '" << filename << "':" << error << std::endl;
+        exit(EXIT_FAILURE);
+	}
+	factory->addEntityBlueprint("player", entityBlueprint);
 
 	return factory;
 }
