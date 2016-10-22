@@ -2,12 +2,12 @@
 #include "../../generated/MessageAdapters.hpp"
 #include "../Signals.hpp"
 #include "../Constants.hpp"
-#include "../EntityFactory.hpp"
 #include "../components/LocalPlayerComponent.hpp"
 #include "../components/InputComponent.hpp"
 #include "../components/PlayerComponent.hpp"
 #include "../components/VelocityComponent.hpp"
 #include "../components/PositionComponent.hpp"
+#include "../components/RenderComponent.hpp"
 #include <ecstasy/core/Engine.hpp>
 #include <ecstasy/core/Entity.hpp>
 #include <enet/enet.h>
@@ -62,12 +62,19 @@ void ClientMessageHandler::handleHandshakeServerMessage(eznet::HandshakeServerMe
 void ClientMessageHandler::handleCreatePlayersMessage(eznet::CreatePlayersMessage& message, ENetEvent& event) {
 	for (auto& entry : message.entities) {
 		std::cout << "entity " << std::to_string(entry.entityId) << " created" << std::endl;
-		auto entity = EntityFactory::createPlayer(engine, entry.x, entry.y, entry.color);
+		auto entity = engine.assembleEntity("player");
+		auto pos = entity->get<PositionComponent>();
+		pos->x = entry.x;
+		pos->y = entry.y;
+		auto render = entity->get<RenderComponent>();
+		render->color = entry.color;
+		render->size = entry.size;
 		auto vel = entity->get<VelocityComponent>();
 		if(vel) {
 			vel->x = entry.velX;
 			vel->y = entry.velY;
 		}
+		engine.addEntity(entity);
 		mapEntity(entry.entityId, entity);
 	}
 }

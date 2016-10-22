@@ -13,9 +13,43 @@
 
 #include "state/StateManager.hpp"
 #include "states/menupages/MenuPageMain.hpp"
+#include <ecstasy/utils/EntityFactory.hpp>
+#include "components/ComponentFactories.hpp"
+#include "components/PlayerComponent.hpp"
+#include "components/LocalPlayerComponent.hpp"
+#include "components/InputComponent.hpp"
+#include "components/PositionComponent.hpp"
+#include "components/VelocityComponent.hpp"
+#include "components/RenderComponent.hpp"
 
 static void error_callback(int error, const char* description) {
     fprintf(stderr, "Error: %s\n", description);
+}
+
+auto createEntityFactory() {
+	auto factory = std::make_shared<EntityFactory>();
+	
+	// Setup component factories
+	factory->addComponentFactory<RenderComponentFactory>("Render");
+	factory->addComponentFactory<SimpleComponentFactory<InputComponent>>("Input");
+	factory->addComponentFactory<SimpleComponentFactory<LocalPlayerComponent>>("LocalPlayer");
+	factory->addComponentFactory<SimpleComponentFactory<PlayerComponent>>("Player");
+	factory->addComponentFactory<SimpleComponentFactory<PositionComponent>>("Position");
+	factory->addComponentFactory<SimpleComponentFactory<VelocityComponent>>("Velocity");
+
+	// Fixme: read blueprints from .def files instead.
+	auto playerBlueprint = std::make_shared<EntityBlueprint>();
+	auto renderBlueprint = std::make_shared<ComponentBlueprint>("Render");
+	renderBlueprint->set("size", "25");
+	renderBlueprint->set("color", "FF0000");
+	playerBlueprint->add(renderBlueprint);
+	playerBlueprint->add(std::make_shared<ComponentBlueprint>("Input"));
+	playerBlueprint->add(std::make_shared<ComponentBlueprint>("Player"));
+	playerBlueprint->add(std::make_shared<ComponentBlueprint>("Position"));
+	playerBlueprint->add(std::make_shared<ComponentBlueprint>("Velocity"));
+	factory->addEntityBlueprint("player", playerBlueprint);
+
+	return factory;
 }
 
 Game::Game() {}
@@ -62,6 +96,7 @@ void Game::run() {
 		self->getStateManager().resize(width, height);
 	});
 	
+	stateManager.setEntityFactory(createEntityFactory());
 	auto mainmenu = std::make_shared<MenuPageMain>(stateManager, nk);
 	stateManager.push(mainmenu);
 

@@ -8,11 +8,8 @@
 #include "../systems/InputSystem.hpp"
 #include "../systems/MovementSystem.hpp"
 #include "../systems/RenderSystem.hpp"
-#include "../components/PlayerComponent.hpp"
 #include "../components/LocalPlayerComponent.hpp"
-#include "../components/InputComponent.hpp"
 #include "../components/PositionComponent.hpp"
-#include "../components/VelocityComponent.hpp"
 #include "../components/RenderComponent.hpp"
 #include "../Constants.hpp"
 #include "../net/ServerConnectHandler.hpp"
@@ -20,13 +17,13 @@
 #include "../net/ClientConnectHandler.hpp"
 #include "../net/ClientMessageHandler.hpp"
 #include "../Signals.hpp"
-#include "../EntityFactory.hpp"
 
 PlayState::PlayState(StateManager& manager, nk_context* nk, bool isServer)
 	: manager(manager), canvas(nk), ingameMenu(std::make_shared<MenuPageIngame>(menuStateManager, nk)),
 	connectingMenu(std::make_shared<MenuPageConnecting>(menuStateManager, nk)), 
 	chatMenu(std::make_shared<MenuPageChat>(menuStateManager, nk)), isServer(isServer) {
-	
+
+	engine.setEntityFactory(manager.getEntityFactory());
 	engine.addSystem<InputSystem>();
 	if(isServer)
 		engine.addSystem<ApplyInputSystem>();
@@ -98,10 +95,13 @@ void ServerPlayState::onClientDisconnected(NetPlayerInfo *info) {
 void ServerPlayState::entered() {
 	PlayState::entered();
 	
-	auto localPlayer = EntityFactory::createPlayer(engine, 150, 250, nk_rgba(255,0,0,255));
+	auto localPlayer = engine.assembleEntity("player");
+	auto pos = localPlayer->get<PositionComponent>();
+	pos->x = 150;
+	pos->y = 250;
+	localPlayer->get<RenderComponent>()->color = nk_rgba(255,0,0,255);
 	localPlayer->assign<LocalPlayerComponent>();
-	EntityFactory::createPlayer(engine, 250, 250, nk_rgba(0,255,0,255));
-	EntityFactory::createPlayer(engine, 200, 400, nk_rgba(0,0,255,255));
+	engine.addEntity(localPlayer);
 	
 	if(!discoveryServer.start(Constants::DISCOVERY_PORT, servername,
 						 port, Constants::MAX_SLOTS))

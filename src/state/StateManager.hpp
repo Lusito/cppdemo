@@ -3,8 +3,13 @@
 #include <vector>
 class AbstractState;
 
+namespace ECS {
+	class EntityFactory;
+}
+using ECS::EntityFactory;
 class StateManager {
 private:
+	std::shared_ptr<EntityFactory> entityFactory;
 	std::vector<std::shared_ptr<AbstractState>> states;
 	int width = 0;
 	int height = 0;
@@ -22,4 +27,12 @@ public:
 	void update(float deltaTime);
 	bool handleKey(int key, int scancode, int action, int mods);
 	void resize(int width, int height);
+
+	void setEntityFactory(std::shared_ptr<EntityFactory> entityFactory) {
+		this->entityFactory = entityFactory;
+	}
+
+	std::shared_ptr<EntityFactory> getEntityFactory() {
+		return entityFactory;
+	}
 };

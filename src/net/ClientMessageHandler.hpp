@@ -3,7 +3,7 @@
 #include <eznet/MessageHandler.hpp>
 #include <signal11/Signal.hpp>
 #include <memory>
-#include <map>
+#include <unordered_map>
 
 struct Signals;
 struct _ENetPeer;
@@ -25,7 +25,7 @@ private:
 	eznet::BufferWriter messageWriter;
 	ENetPeer* peer;
 	ECS::Engine &engine;
-	std::map<uint64_t, uint64_t> entityMap;
+	std::unordered_map<uint64_t, uint64_t> entityMap;
 	const std::vector<ECS::Entity *> *localPlayers;
 	float nextBroadcast = 0;
 

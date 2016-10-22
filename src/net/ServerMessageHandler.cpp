@@ -8,7 +8,6 @@
 #include "../components/PositionComponent.hpp"
 #include "../components/VelocityComponent.hpp"
 #include "../components/InputComponent.hpp"
-#include "../EntityFactory.hpp"
 #include <enet/enet.h>
 #include <ecstasy/core/Engine.hpp>
 
@@ -111,13 +110,23 @@ void ServerMessageHandler::handleHandshakeClientMessage(eznet::HandshakeClientMe
 	signals->clientConnected.emit(info);
 	
 	// Create player
-	auto ent = EntityFactory::createPlayer(engine, 0, 0, nk_rgb(255,255,255)); //fixme: color, position
-	info->entityId = ent->getId();
+	auto entity = engine.assembleEntity("player");
+	auto pos = entity->get<PositionComponent>();
+	//fixme: pos
+	pos->x = 0;
+	pos->y = 0;
+	auto render = entity->get<RenderComponent>();
+	render->color = nk_rgb(255,255,255);//fixme: color
+//	250, 250, nk_rgba(0,255,0,255)
+//	200, 400, nk_rgba(0,0,255,255)
+	engine.addEntity(entity);
+	
+	info->entityId = entity->getId();
 
 	// Send greeting back
 	eznet::HandshakeServerMessage reply;
 	reply.status = status;
-	reply.entityId = ent->getId();
+	reply.entityId = entity->getId();
 	reply.playerIndex = info->playerIndex;
 	for (int i=0; i<Constants::MAX_SLOTS; i++) {
 		auto& info = playerInfos.slots[i];
