@@ -1,6 +1,7 @@
 #include "ComponentFactories.hpp"
 #include "../ui/nuklear_setup.h"
 #include "RenderComponent.hpp"
+#include <ecstasy/utils/Blueprint.hpp>
 
 bool RenderComponentFactory::assemble(Entity *entity, ComponentBlueprint &blueprint) {
 	auto comp = entity->assign<RenderComponent>();

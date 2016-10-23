@@ -15,6 +15,7 @@
 #include "state/StateManager.hpp"
 #include "states/menupages/MenuPageMain.hpp"
 #include <ecstasy/utils/EntityFactory.hpp>
+#include <ecstasy/utils/Blueprint.hpp>
 #include <ecstasy/utils/BlueprintParser.hpp>
 #include "components/ComponentFactories.hpp"
 #include "components/PlayerComponent.hpp"

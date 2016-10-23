@@ -1,6 +1,8 @@
 #pragma once 
 #include <ecstasy/utils/EntityFactory.hpp>
 
+using ECS::ComponentBlueprint;
+
 class RenderComponentFactory : public ComponentFactory {
 public:
 	RenderComponentFactory() {}
