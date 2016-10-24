@@ -24,12 +24,12 @@ PlayState::PlayState(StateManager& manager, nk_context* nk, bool isServer)
 	chatMenu(std::make_shared<MenuPageChat>(menuStateManager, nk)), isServer(isServer) {
 
 	engine.setEntityFactory(manager.getEntityFactory());
-	engine.addSystem<InputSystem>();
+	engine.emplaceSystem<InputSystem>();
 	if(isServer)
-		engine.addSystem<ApplyInputSystem>();
-	engine.addSystem<MovementSystem>();
-	engine.addSystem<RenderSystem>(&canvas);
-	engine.addSystem<ChatRenderSystem>(nk);
+		engine.emplaceSystem<ApplyInputSystem>();
+	engine.emplaceSystem<MovementSystem>();
+	engine.emplaceSystem<RenderSystem>(&canvas);
+	engine.emplaceSystem<ChatRenderSystem>(nk);
 }
 
 PlayState::~PlayState() { }
@@ -100,7 +100,7 @@ void ServerPlayState::entered() {
 	pos->x = 150;
 	pos->y = 250;
 	localPlayer->get<RenderComponent>()->color = nk_rgba(255,0,0,255);
-	localPlayer->add<LocalPlayerComponent>();
+	localPlayer->emplace<LocalPlayerComponent>();
 	engine.addEntity(localPlayer);
 	
 	if(!discoveryServer.start(Constants::DISCOVERY_PORT, servername,
