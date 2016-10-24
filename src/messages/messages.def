@@ -20,8 +20,8 @@ struct CreatePlayersEntry
     field y float
     field velX float
     field velY float
-	field size float
-	field color nk_color
+    field size float
+    field color nk_color
 
 message CreatePlayers !reliable
     field[] entities CreatePlayersEntry
