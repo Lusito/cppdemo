@@ -4,7 +4,6 @@
 
 struct RenderComponent: public Component<RenderComponent> {
 	RenderComponent() : color{1,1,1,1} {}
-	~RenderComponent() {}
 	
 	float size = 1;
 	nk_color color;
