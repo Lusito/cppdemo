@@ -2,48 +2,48 @@ include adapters "../src/messages/CustomAdapters.hpp"
 include messages "../src/messages/CustomMessages.hpp"
 
 struct PlayerListEntry
-    field playerIndex uint8_t
-    field name std::string
+	field playerIndex uint8_t
+	field name std::string
 
 message HandshakeServer !reliable
-    field status ServerStatus
-    field playerIndex uint8_t
-    field entityId uint64_t
-    field[] playerList PlayerListEntry
+	field status ServerStatus
+	field playerIndex uint8_t
+	field entityId uint64_t
+	field[] playerList PlayerListEntry
 
 message HandshakeClient !reliable
-    field name std::string
+	field name std::string
 
 struct CreatePlayersEntry
-    field entityId uint64_t
-    field x float
-    field y float
-    field velX float
-    field velY float
-    field size float
-    field color nk_color
+	field entityId uint64_t
+	field x float
+	field y float
+	field velX float
+	field velY float
+	field size float
+	field color nk_color
 
 message CreatePlayers !reliable
-    field[] entities CreatePlayersEntry
+	field[] entities CreatePlayersEntry
 
 message DestroyPlayer !reliable
-    field entityId uint64_t
+	field entityId uint64_t
 
 struct UpdatePlayersEntry
-    field packetNumber uint64_t
-    field entityId uint64_t
-    field x float
-    field y float
-    field velX float
-    field velY float
+	field packetNumber uint64_t
+	field entityId uint64_t
+	field x float
+	field y float
+	field velX float
+	field velY float
 
 message UpdatePlayers !unsequenced
-    field[] updates UpdatePlayersEntry
+	field[] updates UpdatePlayersEntry
 
 message Chat !reliable
-    field username std::string
-    field message std::string
+	field username std::string
+	field message std::string
 
 message InputUpdate !unsequenced
-    field moveX float
-    field moveY float
+	field moveX float
+	field moveY float

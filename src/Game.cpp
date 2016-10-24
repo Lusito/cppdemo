@@ -26,7 +26,7 @@
 #include "components/RenderComponent.hpp"
 
 static void error_callback(int error, const char* description) {
-    fprintf(stderr, "Error: %s\n", description);
+	fprintf(stderr, "Error: %s\n", description);
 }
 
 auto createEntityFactory() {
@@ -45,7 +45,7 @@ auto createEntityFactory() {
 	std::string error = parseBlueprint(filename, entityBlueprint);
 	if(!error.empty()) {
 		std::cerr << "Error parsing '" << filename << "':" << error << std::endl;
-        exit(EXIT_FAILURE);
+		exit(EXIT_FAILURE);
 	}
 	factory->addEntityBlueprint("player", entityBlueprint);
 
@@ -55,43 +55,43 @@ auto createEntityFactory() {
 Game::Game() {}
 
 void Game::run() {
-    GLFWwindow* window;
-    glfwSetErrorCallback(error_callback);
+	GLFWwindow* window;
+	glfwSetErrorCallback(error_callback);
 
-    if (!glfwInit())
-        exit(EXIT_FAILURE);
+	if (!glfwInit())
+		exit(EXIT_FAILURE);
 
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
 
-    window = glfwCreateWindow(640, 480, "Demo", NULL, NULL);
-    if (!window) {
-        glfwTerminate();
-        exit(EXIT_FAILURE);
-    }
+	window = glfwCreateWindow(640, 480, "Demo", NULL, NULL);
+	if (!window) {
+		glfwTerminate();
+		exit(EXIT_FAILURE);
+	}
 
-    glfwMakeContextCurrent(window);
-    gladLoadGLLoader((GLADloadproc) glfwGetProcAddress);
-    glfwSwapInterval(1);
+	glfwMakeContextCurrent(window);
+	gladLoadGLLoader((GLADloadproc) glfwGetProcAddress);
+	glfwSwapInterval(1);
 
-    struct nk_context* nk;
-    struct nk_font_atlas* atlas;
+	struct nk_context* nk;
+	struct nk_font_atlas* atlas;
 
-    nk = nk_glfw3_init(window, NK_GLFW3_INSTALL_CALLBACKS);
-    nk_glfw3_font_stash_begin(&atlas);
-    nk_glfw3_font_stash_end();
+	nk = nk_glfw3_init(window, NK_GLFW3_INSTALL_CALLBACKS);
+	nk_glfw3_font_stash_begin(&atlas);
+	nk_glfw3_font_stash_end();
 
 	{
 		int width, height;
-        glfwGetWindowSize(window, &width, &height);
+		glfwGetWindowSize(window, &width, &height);
 		stateManager.resize(width, height);
 	}
 	glfwSetWindowUserPointer(window, this);
-    glfwSetKeyCallback(window, [] (GLFWwindow* window, int key, int scancode, int action, int mods) {
+	glfwSetKeyCallback(window, [] (GLFWwindow* window, int key, int scancode, int action, int mods) {
 		Game* self = static_cast<Game *>(glfwGetWindowUserPointer(window));
 		self->getStateManager().handleKey(key, scancode, action, mods);
 	});
-    glfwSetWindowSizeCallback(window, [] (GLFWwindow* window, int width, int height) {
+	glfwSetWindowSizeCallback(window, [] (GLFWwindow* window, int width, int height) {
 		Game* self = static_cast<Game *>(glfwGetWindowUserPointer(window));
 		self->getStateManager().resize(width, height);
 	});
@@ -101,25 +101,25 @@ void Game::run() {
 	stateManager.push(mainmenu);
 
 	double lastTime = glfwGetTime();
-    while (!glfwWindowShouldClose(window)) {
+	while (!glfwWindowShouldClose(window)) {
 		double now = glfwGetTime();
 		double deltaTime = now - lastTime;
 		lastTime = now;
 
-        glClear(GL_COLOR_BUFFER_BIT);
-        nk_glfw3_new_frame();
+		glClear(GL_COLOR_BUFFER_BIT);
+		nk_glfw3_new_frame();
 		nk->style.window.fixed_background.data.color.a = 0;
 		
 		stateManager.update(deltaTime);
 
-        nk_glfw3_render(NK_ANTI_ALIASING_ON, 10000, 1000);
+		nk_glfw3_render(NK_ANTI_ALIASING_ON, 10000, 1000);
 
-        glfwSwapBuffers(window);
-        glfwPollEvents();
-    }
+		glfwSwapBuffers(window);
+		glfwPollEvents();
+	}
 
-    glfwDestroyWindow(window);
+	glfwDestroyWindow(window);
 
-    glfwTerminate();
-    exit(EXIT_SUCCESS);
+	glfwTerminate();
+	exit(EXIT_SUCCESS);
 }

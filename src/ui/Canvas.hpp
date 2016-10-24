@@ -5,11 +5,11 @@
 class Canvas {
 private:
 	nk_context* nk;
-    struct nk_panel layout;
-    struct nk_command_buffer *painter;
-    struct nk_vec2 backupSpacing;
-    struct nk_vec2 backupPadding;
-    struct nk_style_item backupBackground;
+	struct nk_panel layout;
+	struct nk_command_buffer *painter;
+	struct nk_vec2 backupSpacing;
+	struct nk_vec2 backupPadding;
+	struct nk_style_item backupBackground;
 	struct nk_rect area{0,0,0,0};
 
 public:

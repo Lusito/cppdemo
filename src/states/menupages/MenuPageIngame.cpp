@@ -20,7 +20,7 @@ void MenuPageIngame::updateContent() {
 		Signals::getInstance()->error.emit("User enforced a disconnect");
 	nk_layout_row_dynamic(nk, 30, 1);
 	if (nk_button_label(nk, "Exit")) {
-        exit(EXIT_SUCCESS);
+		exit(EXIT_SUCCESS);
 //		glfwSetWindowShouldClose(window, GLFW_TRUE);
 	}
 }
