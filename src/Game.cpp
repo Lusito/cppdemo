@@ -40,10 +40,9 @@ auto createEntityFactory() {
 	factory->addComponentFactory<SimpleComponentFactory<PositionComponent>>("Position");
 	factory->addComponentFactory<SimpleComponentFactory<VelocityComponent>>("Velocity");
 
-	BlueprintParser parser;
 	std::shared_ptr<EntityBlueprint> entityBlueprint;
 	std::string filename = "assets/entities/player.def";
-	std::string error = parser.parse(filename, entityBlueprint);
+	std::string error = parseBlueprint(filename, entityBlueprint);
 	if(!error.empty()) {
 		std::cerr << "Error parsing '" << filename << "':" << error << std::endl;
         exit(EXIT_FAILURE);

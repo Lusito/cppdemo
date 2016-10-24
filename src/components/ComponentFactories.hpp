@@ -1,5 +1,5 @@
 #pragma once 
-#include <ecstasy/utils/EntityFactory.hpp>
+#include <ecstasy/utils/ComponentFactory.hpp>
 
 using ECS::ComponentBlueprint;
 
