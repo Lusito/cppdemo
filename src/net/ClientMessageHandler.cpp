@@ -57,7 +57,7 @@ void ClientMessageHandler::handleHandshakeServerMessage(eznet::HandshakeServerMe
 	}
 	auto ent = getEntity(message.entityId);
 	if(ent)
-		ent->assign<LocalPlayerComponent>();
+		ent->add<LocalPlayerComponent>();
 }
 void ClientMessageHandler::handleCreatePlayersMessage(eznet::CreatePlayersMessage& message, ENetEvent& event) {
 	for (auto& entry : message.entities) {

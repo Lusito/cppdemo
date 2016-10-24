@@ -100,7 +100,7 @@ void ServerPlayState::entered() {
 	pos->x = 150;
 	pos->y = 250;
 	localPlayer->get<RenderComponent>()->color = nk_rgba(255,0,0,255);
-	localPlayer->assign<LocalPlayerComponent>();
+	localPlayer->add<LocalPlayerComponent>();
 	engine.addEntity(localPlayer);
 	
 	if(!discoveryServer.start(Constants::DISCOVERY_PORT, servername,
