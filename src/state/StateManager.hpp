@@ -3,10 +3,10 @@
 #include <vector>
 class AbstractState;
 
-namespace ECS {
+namespace ecstasy {
 	class EntityFactory;
 }
-using ECS::EntityFactory;
+using ecstasy::EntityFactory;
 class StateManager {
 private:
 	std::shared_ptr<EntityFactory> entityFactory;

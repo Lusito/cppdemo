@@ -13,7 +13,7 @@ typedef _ENetPacket ENetPacket;
 struct _ENetHost;
 typedef _ENetHost ENetHost;
 
-namespace ECS {
+namespace ecstasy {
 	class Engine;
 	class Entity;
 }
@@ -24,13 +24,13 @@ private:
 	ConnectionScope connectionScope;
 	eznet::BufferWriter messageWriter;
 	ENetPeer* peer;
-	ECS::Engine &engine;
+	ecstasy::Engine &engine;
 	std::unordered_map<uint64_t, uint64_t> entityMap;
-	const std::vector<ECS::Entity *> *localPlayers;
+	const std::vector<ecstasy::Entity *> *localPlayers;
 	float nextBroadcast = 0;
 
 public:
-	ClientMessageHandler(const std::string &username, ENetPeer* peer, ECS::Engine &engine);
+	ClientMessageHandler(const std::string &username, ENetPeer* peer, ecstasy::Engine &engine);
 	ClientMessageHandler(const ClientMessageHandler& orig) = delete;
 	~ClientMessageHandler();
 	
@@ -52,6 +52,6 @@ private:
 	void sendInputUpdate();
 	void send(NetChannel channel, ENetPacket* packet);
 	
-	ECS::Entity* getEntity(uint64_t id);
-	void mapEntity(uint64_t id, ECS::Entity* entity);
+	ecstasy::Entity* getEntity(uint64_t id);
+	void mapEntity(uint64_t id, ecstasy::Entity* entity);
 };

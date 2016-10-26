@@ -1,7 +1,7 @@
 #pragma once 
 #include <ecstasy/utils/ComponentFactory.hpp>
 
-using ECS::ComponentBlueprint;
+using ecstasy::ComponentBlueprint;
 
 class RenderComponentFactory : public ComponentFactory {
 public:

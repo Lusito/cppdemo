@@ -13,12 +13,12 @@ struct _ENetPacket;
 typedef _ENetPacket ENetPacket;
 struct _ENetHost;
 typedef _ENetHost ENetHost;
-namespace ECS {
+namespace ecstasy {
 	class Engine;
 }
 class ServerMessageHandler : public eznet::MessageHandler {
 private:
-	ECS::Engine &engine;
+	ecstasy::Engine &engine;
 	ServerStatus status = ServerStatus::INIT;
 	eznet::BufferWriter messageWriter;
 	ENetHost* host;
@@ -28,7 +28,7 @@ private:
 	float nextBroadcast = 0;
 
 public:
-	ServerMessageHandler(ENetHost* host, NetPlayerInfos &playerInfos, ECS::Engine &engine);
+	ServerMessageHandler(ENetHost* host, NetPlayerInfos &playerInfos, ecstasy::Engine &engine);
 	ServerMessageHandler(const ServerMessageHandler& orig) = delete;
 	~ServerMessageHandler();
 	
