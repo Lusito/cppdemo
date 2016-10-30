@@ -9,7 +9,7 @@ public:
 	ClientConnectHandler();
 	ClientConnectHandler(const ClientConnectHandler& orig) = delete;
 	~ClientConnectHandler();
-	
+
 	void onConnect(ENetEvent& event) override;
 	void onDisconnect(ENetEvent& event) override;
 };

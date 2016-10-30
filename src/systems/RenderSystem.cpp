@@ -2,9 +2,9 @@
 #include "../components/PositionComponent.hpp"
 #include "../components/RenderComponent.hpp"
 #include "../ui/Canvas.hpp"
+#include <ecstasy/core/Family.hpp>
 
 RenderSystem::RenderSystem(Canvas *canvas) : IteratingSystem(Family::all<PositionComponent, RenderComponent>().get()), canvas(canvas) {
-	
 }
 
 void RenderSystem::update(float deltaTime) {

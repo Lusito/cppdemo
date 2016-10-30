@@ -10,7 +10,7 @@ public:
 	MenuPageChat(StateManager& manager, nk_context* nk);
 	MenuPageChat(const MenuPageChat& orig) = delete;
 	virtual ~MenuPageChat();
-	
+
 	void updateContent() override;
 
 	void resize(int width, int height) override {

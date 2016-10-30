@@ -18,19 +18,19 @@ MenuPageJoinServer::~MenuPageJoinServer() { }
 void MenuPageJoinServer::updateContent() {
 	nk_layout_row_dynamic(nk, 30, 1);
 	nk_label(nk, "Join Server", NK_TEXT_ALIGN_CENTERED|NK_TEXT_ALIGN_BOTTOM);
-	
+
 	nk_layout_row_dynamic(nk, 30, 1);
 	nk_label(nk, "Hostname or IP:", NK_TEXT_ALIGN_LEFT|NK_TEXT_ALIGN_BOTTOM);
-	
+
 	nk_layout_row_dynamic(nk, 30, 1);
 	nk_edit_string(nk, NK_EDIT_SIMPLE, hostname, &hostnameLength, 256, nk_filter_default);
-	
+
 	nk_layout_row_dynamic(nk, 30, 1);
 	nk_label(nk, "Username:", NK_TEXT_ALIGN_LEFT|NK_TEXT_ALIGN_BOTTOM);
-	
+
 	nk_layout_row_dynamic(nk, 30, 1);
 	nk_edit_string(nk, NK_EDIT_SIMPLE, username, &usernameLength, 256, nk_filter_default);
-	
+
 	nk_layout_row_dynamic(nk, 30, 0);
 	nk_layout_row_dynamic(nk, 30, 2);
 	if (nk_button_label(nk, "Back")) {

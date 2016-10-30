@@ -10,7 +10,7 @@ public:
 	Game();
 	Game(const Game& orig) = delete;
 	~Game() = default;
-	
+
 	void run();
 
 	StateManager& getStateManager() {

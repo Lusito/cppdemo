@@ -36,7 +36,7 @@ struct NetPlayerInfo {
 
 struct NetPlayerInfos {
 	NetPlayerInfo slots[Constants::MAX_SLOTS];
-	
+
 	NetPlayerInfos(const std::string &username) {
 		for(uint8_t i = 0; i < Constants::MAX_SLOTS; i++) {
 			slots[i].invalidate();

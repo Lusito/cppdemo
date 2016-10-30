@@ -19,7 +19,7 @@ void StateManager::push(std::shared_ptr<AbstractState> state) {
 bool StateManager::pop() {
 	if(states.empty())
 		return false;
-	
+
 	{
 		auto back = states.back();
 		back->leaving();
@@ -51,7 +51,7 @@ bool StateManager::handleKey(int key, int scancode, int action, int mods) {
 void StateManager::resize(int width, int height) {
 	this->width = width;
 	this->height = height;
-	
+
 	if(!states.empty()) {
 		auto back = states.back();
 		back->resize(width, height);

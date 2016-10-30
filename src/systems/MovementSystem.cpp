@@ -1,9 +1,9 @@
 #include "MovementSystem.hpp"
 #include "../components/VelocityComponent.hpp"
 #include "../components/PositionComponent.hpp"
+#include <ecstasy/core/Family.hpp>
 
 MovementSystem::MovementSystem() : IteratingSystem(Family::all<VelocityComponent, PositionComponent>().get()) {
-	
 }
 
 void MovementSystem::processEntity(Entity *entity, float deltaTime) {

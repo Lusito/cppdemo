@@ -11,7 +11,7 @@ public:
 	MenuPageConnecting(StateManager& manager, nk_context* nk);
 	MenuPageConnecting(const MenuPageConnecting& orig) = delete;
 	virtual ~MenuPageConnecting();
-	
+
 	virtual void updateContent();
 	void setMessage(const std::string &message_) {
 		message = message_;

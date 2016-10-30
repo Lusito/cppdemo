@@ -18,7 +18,7 @@ public:
 	StateManager();
 	StateManager(const StateManager& orig) = delete;
 	~StateManager();
-	
+
 	void push(std::shared_ptr<AbstractState> state);
 	bool pop();
 	bool empty() const { return states.empty(); }

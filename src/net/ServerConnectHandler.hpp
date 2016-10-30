@@ -16,7 +16,7 @@ public:
 	ServerConnectHandler(NetPlayerInfos &playerInfos);
 	ServerConnectHandler(const ServerConnectHandler& orig) = delete;
 	~ServerConnectHandler();
-	
+
 	void onConnect(ENetEvent& event) override;
 	void onDisconnect(ENetEvent& event) override;
 };

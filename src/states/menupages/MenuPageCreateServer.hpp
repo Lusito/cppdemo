@@ -12,6 +12,6 @@ public:
 	MenuPageCreateServer(StateManager& manager, nk_context* nk);
 	MenuPageCreateServer(const MenuPageCreateServer& orig) = delete;
 	virtual ~MenuPageCreateServer();
-	
+
 	virtual void updateContent();
 };

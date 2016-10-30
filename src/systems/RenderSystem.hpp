@@ -8,7 +8,7 @@ private:
 
 public:
 	RenderSystem(Canvas *canvas);
-	
+
 	void update(float deltaTime) override;
 	void processEntity(Entity *entity, float deltaTime) override;
 };

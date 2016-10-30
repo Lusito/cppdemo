@@ -16,9 +16,9 @@ private:
 
 public:
 	ChatRenderSystem(nk_context* nk);
-	
+
 	void update(float deltaTime) override;
-	
+
 	void resize(int width, int height) {
 		area.w = width;
 		area.h = height - 50;

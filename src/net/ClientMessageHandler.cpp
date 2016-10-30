@@ -10,17 +10,18 @@
 #include "../components/RenderComponent.hpp"
 #include <ecstasy/core/Engine.hpp>
 #include <ecstasy/core/Entity.hpp>
+#include <ecstasy/core/Family.hpp>
 #include <enet/enet.h>
 #include <iostream>
 #include <math.h>
 
 ClientMessageHandler::ClientMessageHandler(const std::string &username, ENetPeer* peer, Engine &engine)
-	: username(username), messageWriter(Constants::MAX_MESSAGE_SIZE), peer(peer), engine(engine) {	
+	: username(username), messageWriter(Constants::MAX_MESSAGE_SIZE), peer(peer), engine(engine) {
 	localPlayers = engine.getEntitiesFor(Family::all<LocalPlayerComponent, InputComponent>().get());
 
 	connectionScope += Signals::getInstance()->serverConnected.connect(this, &ClientMessageHandler::onServerConnected);
 	connectionScope += Signals::getInstance()->submitChat.connect(this, &ClientMessageHandler::onSubmitChat);
-	
+
 	putCallback(this, &ClientMessageHandler::handleHandshakeServerMessage);
 	putCallback(this, &ClientMessageHandler::handleCreatePlayersMessage);
 	putCallback(this, &ClientMessageHandler::handleDestroyPlayerMessage);

@@ -20,7 +20,7 @@
 
 PlayState::PlayState(StateManager& manager, nk_context* nk, bool isServer)
 	: manager(manager), canvas(nk), ingameMenu(std::make_shared<MenuPageIngame>(menuStateManager, nk)),
-	connectingMenu(std::make_shared<MenuPageConnecting>(menuStateManager, nk)), 
+	connectingMenu(std::make_shared<MenuPageConnecting>(menuStateManager, nk)),
 	chatMenu(std::make_shared<MenuPageChat>(menuStateManager, nk)), isServer(isServer) {
 
 	engine.setEntityFactory(manager.getEntityFactory());
@@ -40,12 +40,12 @@ void PlayState::entered() {
 }
 
 void PlayState::leaving() {
-	
+
 }
 
 void PlayState::update(float deltaTime) {
 	engine.update(deltaTime);
-	
+
 	menuStateManager.update(deltaTime);
 }
 
@@ -94,7 +94,7 @@ void ServerPlayState::onClientDisconnected(NetPlayerInfo *info) {
 
 void ServerPlayState::entered() {
 	PlayState::entered();
-	
+
 	auto localPlayer = engine.assembleEntity("player");
 	auto pos = localPlayer->get<PositionComponent>();
 	pos->x = 150;
@@ -102,7 +102,7 @@ void ServerPlayState::entered() {
 	localPlayer->get<RenderComponent>()->color = nk_rgba(255,0,0,255);
 	localPlayer->emplace<LocalPlayerComponent>();
 	engine.addEntity(localPlayer);
-	
+
 	if(!discoveryServer.start(Constants::DISCOVERY_PORT, servername,
 						 port, Constants::MAX_SLOTS))
 		Signals::getInstance()->error.emit("Could not start discovery server");

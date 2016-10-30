@@ -18,7 +18,7 @@ public:
 	MenuPage(StateManager& manager, nk_context* nk, const std::string &name);
 	MenuPage(const MenuPage& orig) = delete;
 	virtual ~MenuPage();
-	
+
 	void update(float deltaTime) override;
 	virtual void show(bool visible);
 	void entered() override { show(true); }

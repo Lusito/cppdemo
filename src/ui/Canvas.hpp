@@ -1,4 +1,4 @@
-#pragma once 
+#pragma once
 
 #include "nuklear_setup.h"
 
@@ -16,14 +16,14 @@ public:
 	Canvas(nk_context* nk);
 	Canvas(const Canvas& orig) = delete;
 	~Canvas();
-	
+
 	void begin();
 	void end();
-	
+
 	void setSize(float width, float height) {
 		area.w = width;
 		area.h = height;
 	}
-	
+
 	void drawCircle(float x, float y, float radius, nk_color &color);
 };

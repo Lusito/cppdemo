@@ -31,7 +31,7 @@ static void error_callback(int error, const char* description) {
 
 auto createEntityFactory() {
 	auto factory = std::make_shared<EntityFactory>();
-	
+
 	// Setup component factories
 	factory->addComponentFactory<RenderComponentFactory>("Render");
 	factory->addComponentFactory<SimpleComponentFactory<InputComponent>>("Input");
@@ -95,7 +95,7 @@ void Game::run() {
 		Game* self = static_cast<Game *>(glfwGetWindowUserPointer(window));
 		self->getStateManager().resize(width, height);
 	});
-	
+
 	stateManager.setEntityFactory(createEntityFactory());
 	auto mainmenu = std::make_shared<MenuPageMain>(stateManager, nk);
 	stateManager.push(mainmenu);
@@ -109,7 +109,7 @@ void Game::run() {
 		glClear(GL_COLOR_BUFFER_BIT);
 		nk_glfw3_new_frame();
 		nk->style.window.fixed_background.data.color.a = 0;
-		
+
 		stateManager.update(deltaTime);
 
 		nk_glfw3_render(NK_ANTI_ALIASING_ON, 10000, 1000);

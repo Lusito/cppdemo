@@ -31,7 +31,7 @@ protected:
 public:
 	PlayState(const PlayState& orig) = delete;
 	virtual ~PlayState();
-	
+
 	void entered() override;
 	void leaving() override;
 	void update(float deltaTime) override;

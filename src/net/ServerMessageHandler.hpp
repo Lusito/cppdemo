@@ -31,20 +31,20 @@ public:
 	ServerMessageHandler(ENetHost* host, NetPlayerInfos &playerInfos, ecstasy::Engine &engine);
 	ServerMessageHandler(const ServerMessageHandler& orig) = delete;
 	~ServerMessageHandler();
-	
+
 	void update(float deltaTime);
-	
+
 private:
 	// Signal callbacks
 	void onEntityAdded(Entity *entity);
 	void onEntityRemoved(Entity *entity);
 	void onSubmitChat(const std::string &message);
-	
+
 	// Message handlers
 	void handleHandshakeClientMessage(eznet::HandshakeClientMessage& message, ENetEvent& event);
 	void handleChatMessage(eznet::ChatMessage& message, ENetEvent& event);
 	void handleInputUpdateMessage(eznet::InputUpdateMessage& message, ENetEvent& event);
-	
+
 	// Utility
 	void broadcastPlayerUpdates();
 	void send(ENetPeer* peer, NetChannel channel, ENetPacket* packet);

@@ -7,7 +7,7 @@ public:
 	AbstractState();
 	AbstractState(const AbstractState& orig) = delete;
 	virtual ~AbstractState();
-	
+
 	virtual void entered() {}
 	virtual void leaving() {}
 	virtual void obscuring() {}

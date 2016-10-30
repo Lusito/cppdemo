@@ -10,18 +10,19 @@
 #include "../components/InputComponent.hpp"
 #include <enet/enet.h>
 #include <ecstasy/core/Engine.hpp>
+#include <ecstasy/core/Family.hpp>
 
 const int max_size_per_packet = Constants::MAX_MESSAGE_SIZE - sizeof(eznet::MessageType::NUM_TYPES);
 
 ServerMessageHandler::ServerMessageHandler(ENetHost* host, NetPlayerInfos &playerInfos, Engine &engine)
 	: engine(engine), messageWriter(Constants::MAX_MESSAGE_SIZE), host(host), playerInfos(playerInfos) {
-	
+
 	players = engine.getEntitiesFor(Family::all<PlayerComponent, RenderComponent, PositionComponent, VelocityComponent>().get());
 
 	connectionScope += engine.entityAdded.connect(this, &ServerMessageHandler::onEntityAdded);
 	connectionScope += engine.entityAdded.connect(this, &ServerMessageHandler::onEntityRemoved);
 	connectionScope += Signals::getInstance()->submitChat.connect(this, &ServerMessageHandler::onSubmitChat);
-	
+
 	putCallback(this, &ServerMessageHandler::handleHandshakeClientMessage);
 	putCallback(this, &ServerMessageHandler::handleChatMessage);
 	putCallback(this, &ServerMessageHandler::handleInputUpdateMessage);
@@ -49,7 +50,7 @@ void ServerMessageHandler::broadcastPlayerUpdates() {
 		auto vel = entity->get<VelocityComponent>();
 		entry.velX = vel->x;
 		entry.velY = vel->y;
-		
+
 		if(getMessageSize(message) + getMessageSize(entry)>max_size_per_packet) {
 			broadcast(NetChannel::WORLD_UNRELIABLE, createPacket(messageWriter, message));
 			message.updates.clear();
@@ -89,7 +90,7 @@ void ServerMessageHandler::sendCreatePlayers(ENetPeer* peer) {
 		auto vel = entity->get<VelocityComponent>();
 		entry.velX = vel->x;
 		entry.velY = vel->y;
-		
+
 		if(getMessageSize(message) + getMessageSize(entry)>max_size_per_packet) {
 			send(peer, NetChannel::WORLD_RELIABLE, createPacket(messageWriter, message));
 			message.entities.clear();
@@ -108,7 +109,7 @@ void ServerMessageHandler::handleHandshakeClientMessage(eznet::HandshakeClientMe
 	auto signals = Signals::getInstance();
 	playerInfos.makeUniqueName(info);
 	signals->clientConnected.emit(info);
-	
+
 	// Create player
 	auto entity = engine.assembleEntity("player");
 	auto pos = entity->get<PositionComponent>();
@@ -120,7 +121,7 @@ void ServerMessageHandler::handleHandshakeClientMessage(eznet::HandshakeClientMe
 //	250, 250, nk_rgba(0,255,0,255)
 //	200, 400, nk_rgba(0,0,255,255)
 	engine.addEntity(entity);
-	
+
 	info->entityId = entity->getId();
 
 	// Send greeting back

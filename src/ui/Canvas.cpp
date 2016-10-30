@@ -3,7 +3,7 @@
 Canvas::Canvas(nk_context* nk) : nk(nk) { }
 
 Canvas::~Canvas() { }
-	
+
 void Canvas::begin() {
 	backupPadding = nk->style.window.padding;
 	backupSpacing = nk->style.window.spacing;

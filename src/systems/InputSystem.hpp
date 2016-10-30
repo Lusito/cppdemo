@@ -10,8 +10,8 @@ private:
 
 public:
 	InputSystem();
-	
+
 	void processEntity(Entity *entity, float deltaTime) override;
-	
+
 	bool handleKey(int key, int scancode, int action, int mods);
 };

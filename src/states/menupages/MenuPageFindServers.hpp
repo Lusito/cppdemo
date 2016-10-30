@@ -14,9 +14,9 @@ public:
 	MenuPageFindServers(StateManager& manager, nk_context* nk);
 	MenuPageFindServers(const MenuPageFindServers& orig) = delete;
 	virtual ~MenuPageFindServers();
-	
+
 	void updateContent() override;
 	void onServersChanged();
-	
+
 	void show(bool visible) override;
 };

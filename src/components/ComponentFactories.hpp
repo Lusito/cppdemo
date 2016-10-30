@@ -1,4 +1,4 @@
-#pragma once 
+#pragma once
 #include <ecstasy/utils/ComponentFactory.hpp>
 
 using ecstasy::ComponentBlueprint;
@@ -8,6 +8,6 @@ public:
 	RenderComponentFactory() {}
 	RenderComponentFactory(const RenderComponentFactory& orig) = delete;
 	~RenderComponentFactory() {}
-	
+
 	bool assemble(Entity *entity, ComponentBlueprint &blueprint) override;
 };

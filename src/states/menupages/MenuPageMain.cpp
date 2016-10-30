@@ -15,7 +15,7 @@ MenuPageMain::MenuPageMain(StateManager& manager, nk_context* nk)
 	findServersMenu = std::make_shared<MenuPageFindServers>(manager, nk);
 	joinServerMenu = std::make_shared<MenuPageJoinServer>(manager, nk);
 	errorMenu = std::make_shared<MenuPageError>(manager, nk);
-	
+
 	connectionScope += Signals::getInstance()->error.connect(this, &MenuPageMain::onError);
 	connectionScope += Signals::getInstance()->serverDisconnected.connect(this, &MenuPageMain::onServerDisconnected);
 }

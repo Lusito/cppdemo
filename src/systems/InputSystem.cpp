@@ -1,16 +1,16 @@
 #include "InputSystem.hpp"
 #include "../components/InputComponent.hpp"
 #include "../components/LocalPlayerComponent.hpp"
+#include <ecstasy/core/Family.hpp>
 #include <GLFW/glfw3.h>
 #include <math.h>
 
 InputSystem::InputSystem() : IteratingSystem(Family::all<InputComponent, LocalPlayerComponent>().get()) {
-	
 }
 
 void InputSystem::processEntity(Entity *entity, float deltaTime) {
 	auto input = entity->get<InputComponent>();
-	
+
 	float x = 0, y = 0;
 	if(moveUp)
 		y -= 1;
@@ -20,7 +20,7 @@ void InputSystem::processEntity(Entity *entity, float deltaTime) {
 		x -= 1;
 	if(moveRight)
 		x += 1;
-	
+
 	// normalize
 	if(x || y) {
 		float len = sqrtf(x*x + y*y);

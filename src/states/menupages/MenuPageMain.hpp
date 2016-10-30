@@ -19,7 +19,7 @@ public:
 	MenuPageMain(StateManager& manager, nk_context* nk);
 	MenuPageMain(const MenuPageMain& orig) = delete;
 	virtual ~MenuPageMain();
-	
+
 	virtual void updateContent();
 
 private:
