@@ -10,5 +10,5 @@
 [submodule "lib/ecstasy"]
 	path = lib/ecstasy
 	url = https://github.com/Lusito/ecstasy.git
-	branch = feature/cmake
+	branch = develop
 	ignore = untracked
